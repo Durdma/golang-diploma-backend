@@ -7,6 +7,6 @@ import (
 
 // Admin - сущность для сотрудников платформы
 type Admin struct {
-	ID primitive.ObjectID
+	ID primitive.ObjectID `json:"id" bson:"_id"`
 	models.BaseUser
 }
