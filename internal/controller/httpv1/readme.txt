@@ -1,0 +1,1 @@
+В данной директории хранятся endpoints и controllers логика, перевод json в models
