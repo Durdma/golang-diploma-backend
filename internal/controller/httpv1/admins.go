@@ -3,7 +3,7 @@ package httpv1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sas/internal/models"
+	"sas/internal/models/admin"
 	"sas/internal/service"
 )
 
@@ -16,7 +16,7 @@ func NewAdminsController(service *service.AdminsService) *AdminsController {
 }
 
 func (ac *AdminsController) SignUpAdmin(ctx *gin.Context) {
-	var data models.AdminRecord
+	var data admin.Admin
 
 	if err := ctx.BindJSON(&data); err != nil {
 		newResponse(ctx, http.StatusBadRequest, "Cant unmarshall JSON!")

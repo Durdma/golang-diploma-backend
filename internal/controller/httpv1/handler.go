@@ -3,7 +3,7 @@ package httpv1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sas/internal/models"
+	error2 "sas/internal/models/error"
 	"sas/internal/service"
 )
 
@@ -27,7 +27,7 @@ func (h *Handler) Init() *gin.Engine {
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK,
-			models.CustomError{
+			error2.CustomError{
 				Status: http.StatusOK,
 				Msg:    "OK!",
 			})

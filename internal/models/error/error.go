@@ -1,4 +1,4 @@
-package models
+package error
 
 type CustomError struct {
 	Status int

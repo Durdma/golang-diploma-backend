@@ -1,7 +1,8 @@
 package service
 
 import (
-	"sas/internal/models"
+	"sas/internal/models/admin"
+	error2 "sas/internal/models/error"
 	"sas/internal/repository"
 )
 
@@ -13,7 +14,7 @@ func NewAdminService(repo *repository.TmpRepo) *AdminsService {
 	return &AdminsService{repository: repo}
 }
 
-func (as *AdminsService) SignUp(data *models.AdminRecord) (string, *models.CustomError) {
+func (as *AdminsService) SignUp(data *admin.Admin) (string, *error2.CustomError) {
 	//Some validation
 
 	return as.repository.AddAdmin(data)
@@ -23,6 +24,6 @@ func (as *AdminsService) SignIn(email string, username string, password string) 
 
 }
 
-func (as *AdminsService) GetAllAdmins() ([]*models.AdminRecord, *models.CustomError) {
+func (as *AdminsService) GetAllAdmins() ([]*admin.Admin, *error2.CustomError) {
 	return as.repository.GetAdmins()
 }

@@ -2,28 +2,29 @@ package repository
 
 import (
 	"net/http"
-	"sas/internal/models"
+	"sas/internal/models/admin"
+	error2 "sas/internal/models/error"
 )
 
 type TmpRepo struct {
-	repo []*models.AdminRecord
+	repo []*admin.Admin
 }
 
 func NewTmpRepo() *TmpRepo {
-	return &TmpRepo{repo: make([]*models.AdminRecord, 0)}
+	return &TmpRepo{repo: make([]*admin.Admin, 0)}
 }
 
-func (r *TmpRepo) AddAdmin(data *models.AdminRecord) (string, *models.CustomError) {
+func (r *TmpRepo) AddAdmin(data *admin.Admin) (string, *error2.CustomError) {
 	for _, rec := range r.repo {
 		if rec.Email == data.Email {
-			return "", &models.CustomError{
+			return "", &error2.CustomError{
 				Status: http.StatusBadRequest,
 				Msg:    "You can't register more than one account on email.",
 			}
 		}
 
 		if rec.Username == data.Username {
-			return "", &models.CustomError{
+			return "", &error2.CustomError{
 				Status: http.StatusBadRequest,
 				Msg:    "Username is already used!",
 			}
@@ -37,9 +38,9 @@ func (r *TmpRepo) AddAdmin(data *models.AdminRecord) (string, *models.CustomErro
 	return "Added!", nil
 }
 
-func (r *TmpRepo) GetAdmins() ([]*models.AdminRecord, *models.CustomError) {
+func (r *TmpRepo) GetAdmins() ([]*admin.Admin, *error2.CustomError) {
 	if len(r.repo) == 0 {
-		return nil, &models.CustomError{
+		return nil, &error2.CustomError{
 			Status: http.StatusBadRequest,
 			Msg:    "Empty DB!",
 		}
