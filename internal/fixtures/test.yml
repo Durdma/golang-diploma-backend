@@ -1,0 +1,15 @@
+http:
+  port: 8080
+  readTimeout: 10s
+  writeTimeout: 10s
+
+logger:
+  level: 5
+
+mongo:
+  databaseName: testDatabase
+
+auth:
+  accessTokenTTL: 10m
+  refreshTokenTTL: 15m
+  si

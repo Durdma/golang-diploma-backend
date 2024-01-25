@@ -1,0 +1,17 @@
+# TODO Дописать конфиг добавив переменные окружения сюда
+# TODO Точно также переработать тест + фикстура
+
+http:
+  port: 8080
+  readTimeout: 10s
+  writeTimeout: 10s
+
+logger:
+  level: 5
+
+mongo:
+  databaseName: universityPlatform
+
+auth:
+  accessTokenTTL: 15m
+  refreshTokenTTL: 43200m
