@@ -7,8 +7,8 @@ import (
 	"sas/pkg/database/mongodb"
 )
 
-// TODO смотри в config.go
-const configPath = "D:\\Projects\\University\\LAST_COURSE\\ДП\\go-saas\\configs\\main.yml"
+const configPath = "..\\..\\configs\\main"
+const envPath = "../../app"
 
 func main() {
 	mongoClient := mongodb.NewClient("mongodb://localhost:27017", "", "")
@@ -16,7 +16,7 @@ func main() {
 
 	db := mongoClient.Database("universityPlatform")
 
-	cfg, err := config.Init(configPath)
+	cfg, err := config.Init(configPath, envPath)
 	if err != nil {
 		panic(err)
 	}

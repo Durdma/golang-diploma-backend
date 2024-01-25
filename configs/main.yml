@@ -1,4 +1,4 @@
-# TODO Дописать конфиг добавив переменные окружения сюда
+# TODO Все значения, несущие информацию в app.env файл, имена, пароли и тд
 # TODO Точно также переработать тест + фикстура
 
 http:
@@ -7,7 +7,7 @@ http:
   writeTimeout: 10s
 
 logger:
-  level: 5
+  level: 10
 
 mongo:
   databaseName: universityPlatform

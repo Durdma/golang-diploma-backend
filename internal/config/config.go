@@ -1,20 +1,19 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
-	"strings"
+	filepath2 "path/filepath"
 	"time"
 )
 
 // Дефолтные значения параметров конфигурации
 const (
-	defaultHttpPort               = "8080"
-	defaultHttpRWTimeout          = 10 * time.Second
-	defaultHttpMaxHeaderMegabytes = 1
-	defaultLoggerLevel            = 5
-	defaultAccessTokenTTL         = 15 * time.Minute
-	defaultRefreshTokenTTL        = 24 * time.Hour * 30
+	defaultHttpPort      = "8080"
+	defaultHttpRWTimeout = 10 * time.Second
+	//defaultHttpMaxHeaderMegabytes = 1
+	defaultLoggerLevel     = 5
+	defaultAccessTokenTTL  = 15 * time.Minute
+	defaultRefreshTokenTTL = 24 * time.Hour * 30
 )
 
 // Config - Сущность для конфигураций
@@ -27,10 +26,10 @@ type Config struct {
 
 // MongoConfig - Конфиг MongoDB
 type MongoConfig struct {
-	URI      string
-	User     string
-	Password string
-	Name     string
+	URI          string
+	User         string
+	Password     string
+	DatabaseName string
 }
 
 // AuthConfig - Конфиг аутентификации
@@ -53,28 +52,29 @@ type HTTPConfig struct {
 	WriteTimeout time.Duration
 }
 
-// TODO Переписать функции, где извлечение идет из ОС. Добавить эти переменные либо в .env, либо в main.yml
-// TODO Посмотреть подключение к монге, можно ли в локальной бд использовать для входа логин+пароль
 // Init - функция, создает конфиг из переменных окружения
 // На вход подается файл .env в котором описываются значения конфигурации
 // Если указаны не все параметры конфигурации, то используются дефолтные константы
-func Init(path string) (*Config, error) {
+func Init(path string, envPath string) (*Config, error) {
 	setDefaults()
+
+	var cfg Config
 
 	if err := parseConfigFile(path); err != nil {
 		return nil, err
 	}
 
-	if err := parseEnv(); err != nil {
-		return nil, err
-	}
-
-	var cfg Config
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
-	setFromEnv(&cfg)
+	if err := parseConfigFile(envPath); err != nil {
+		return nil, err
+	}
+
+	if err := unmarshalEnv(&cfg); err != nil {
+		return nil, err
+	}
 
 	return &cfg, nil
 }
@@ -89,7 +89,7 @@ func setDefaults() {
 	viper.SetDefault("auth.refreshTokenTTL", defaultRefreshTokenTTL)
 }
 
-// unmarshal - Парсит из viper объекта необходимые значения конфигурации в заданные структуры
+// unmarshal - Парсит из viper объекта необходимые значения конфигурации в заданные структуры, полученные из yml
 func unmarshal(cfg *Config) error {
 	if err := viper.UnmarshalKey("logger.level", &cfg.LoggerLevel); err != nil {
 		return err
@@ -103,85 +103,41 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("auth", &cfg.Auth); err != nil {
+	if err := viper.UnmarshalKey("auth", &cfg.Auth.JWT); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// setFromEnv - Устанавливает в конфиг переменные из ОС.
-func setFromEnv(cfg *Config) {
-	cfg.Mongo.URI = viper.GetString("uri")
-	cfg.Mongo.User = viper.GetString("user")
-	cfg.Mongo.Password = viper.GetString("password")
-	cfg.Auth.PasswordSalt = viper.GetString("salt")
-	cfg.Auth.JWT.SigningKey = viper.GetString("signing_key")
+// unmarshalEnv - Парсит из viper объекта необходимые значения конфигурации в заданные структуры, полученные из .env
+func unmarshalEnv(cfg *Config) error {
+	if err := viper.UnmarshalKey("mongo_uri", &cfg.Mongo.URI); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("mongo_user", &cfg.Mongo.User); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("mongo_pass", &cfg.Mongo.Password); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("password_salt", &cfg.Auth.PasswordSalt); err != nil {
+		return err
+	}
+
+	return viper.UnmarshalKey("jwt_signing_key", &cfg.Auth.JWT.SigningKey)
 }
 
-// TODO Посмотреть подробнее, почему файл конфига находится только по абсолютному пути.
-// TODO сделать подключение по относительному
 // parseConfigFile - Считывает конфиг из файла конфигурации
 func parseConfigFile(filepath string) error {
-	path := strings.Split(filepath, "\\")
-	fmt.Println(path[:len(path)-1])
-	fmt.Println(path[len(path)-1])
+	path := filepath2.Dir(filepath)
+	name := filepath2.Base(filepath)
 
-	ap := ""
-
-	for i := 0; i < len(path)-1; i++ {
-		ap += path[i] + "\\"
-	}
-
-	fmt.Println(ap)
-
-	viper.AddConfigPath(ap)
-	viper.SetConfigName(strings.Split(path[len(path)-1], ".")[0])
+	viper.AddConfigPath(path)
+	viper.SetConfigName(name)
 
 	return viper.ReadInConfig()
-}
-
-// parseEnv - Устанавливает связь между ключами viper и именами переменных в ОС
-func parseEnv() error {
-	if err := parseMongoEnvVariables(); err != nil {
-		return err
-	}
-
-	if err := parsePasswordEnvVariables(); err != nil {
-		return err
-	}
-
-	return parseJWTEnvVariables()
-}
-
-// parseMongoEnvVariables - Устанавливает в viper соответствия ключам и переменным ОС
-func parseMongoEnvVariables() error {
-	// Устанавливает префикс для поиска переменных в ОС (в данном случае будут искаться переменные: MONGO_VARIABLE,
-	// MONGO_URI и т.д.)
-	viper.SetEnvPrefix("mongo")
-
-	// Устанавливает связь между переменной из конфига с переменными viper.
-	// Если передается 1 аргумент, то viper будет искать переменную PREFIX_VARIABLE в данном случае MONGO_URI
-	// Если бы было несколько аргументов в функцию, то по факту для uri были псевдонимы
-	if err := viper.BindEnv("uri"); err != nil {
-		return err
-	}
-
-	if err := viper.BindEnv("user"); err != nil {
-		return err
-	}
-
-	return viper.BindEnv("password")
-}
-
-// parsePasswordEnvVariables - Аналогично функции parseMongoEnvVariables
-func parsePasswordEnvVariables() error {
-	viper.SetEnvPrefix("password")
-	return viper.BindEnv("salt")
-}
-
-// parseJWTEnvVariables - Аналогично функции parseMongoEnvVariables
-func parseJWTEnvVariables() error {
-	viper.SetEnvPrefix("jwt")
-	return viper.BindEnv("signing_key")
 }

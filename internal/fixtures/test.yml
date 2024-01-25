@@ -1,15 +1,14 @@
 http:
-  port: 8080
-  readTimeout: 10s
-  writeTimeout: 10s
+  port: 7777
+  readTimeout: 77s
+  writeTimeout: 77s
 
 logger:
-  level: 5
+  level: 7
 
 mongo:
   databaseName: testDatabase
 
 auth:
-  accessTokenTTL: 10m
-  refreshTokenTTL: 15m
-  si
+  accessTokenTTL: 7m
+  refreshTokenTTL: 777m
