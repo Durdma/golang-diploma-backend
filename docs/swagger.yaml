@@ -1,0 +1,18 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for University Platform
+  title: University Platform API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  AdminAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  EditorsAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
