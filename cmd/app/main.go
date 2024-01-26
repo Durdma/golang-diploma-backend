@@ -13,7 +13,22 @@ import (
 	"syscall"
 )
 
-const configPath = "../../configs/main"
+// @title University Platform API
+// @version 1.0
+// @description API Server for University Platform
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey AdminAuth
+// @in header
+// @name Authorization
+
+// @securityDefinitions.apikey EditorsAuth
+// @in header
+// @name Authorization
+
+const configPath = "..\\..\\configs\\main"
 const envPath = "../../app"
 
 func main() {
@@ -27,7 +42,6 @@ func main() {
 	}
 
 	mongoClient := mongodb.NewClient("mongodb://localhost:27017", "", "")
-	defer mongoClient.Disconnect(context.Background())
 
 	_ = mongoClient.Database("universityPlatform")
 
@@ -36,7 +50,7 @@ func main() {
 	srv := server.NewServer(cfg, handlers.Init())
 	go func() {
 		if err := srv.Run(); err != nil {
-			logrus.Errorf("error occured while running http server: %s\n", err.Error())
+			logrus.Errorf("error occurred while running http server: %s\n", err.Error())
 		}
 	}()
 
@@ -48,4 +62,7 @@ func main() {
 
 	<-quit
 
+	if err := mongoClient.Disconnect(context.Background()); err != nil {
+		logger.Error(err.Error())
+	}
 }

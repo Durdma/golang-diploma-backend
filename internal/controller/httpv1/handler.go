@@ -2,7 +2,11 @@ package httpv1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
+
+	_ "sas/docs"
 )
 
 type Handler struct {
@@ -18,6 +22,8 @@ func (h *Handler) Init() *gin.Engine {
 		gin.Recovery(),
 		gin.Logger(),
 	)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
