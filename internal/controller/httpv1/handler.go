@@ -3,37 +3,25 @@ package httpv1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	error2 "sas/internal/models/error"
-	"sas/internal/service"
 )
 
 type Handler struct {
-	services *service.AdminsService
 }
 
-func NewHandler(services *service.AdminsService) *Handler {
-	return &Handler{
-		services: services,
-	}
+func NewHandler() *Handler {
+	return &Handler{}
 }
 
 func (h *Handler) Init() *gin.Engine {
 	router := gin.Default()
-
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
 	)
 
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK,
-			error2.CustomError{
-				Status: http.StatusOK,
-				Msg:    "OK!",
-			})
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
 	})
-
-	//router.GET("/sign-in")
 
 	return router
 }
