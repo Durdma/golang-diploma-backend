@@ -95,10 +95,6 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("mongo", &cfg.Mongo); err != nil {
-		return err
-	}
-
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
 		return err
 	}
@@ -121,6 +117,10 @@ func unmarshalEnv(cfg *Config) error {
 	}
 
 	if err := viper.UnmarshalKey("mongo_pass", &cfg.Mongo.Password); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("mongo_databasename", &cfg.Mongo.DatabaseName); err != nil {
 		return err
 	}
 

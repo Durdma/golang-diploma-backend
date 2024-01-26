@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sas/internal/config"
 	"sas/pkg/database/mongodb"
+	"sas/pkg/logger"
 )
 
-const configPath = "..\\..\\configs\\main"
+const configPath = "../../configs/main"
 const envPath = "../../app"
 
 func main() {
@@ -21,8 +21,12 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", cfg)
+	if err := logger.Init(); err != nil {
+		panic(err)
+	}
 
-	fmt.Println(db.CreateCollection(context.Background(), "admins"))
+	logger.Infof("%+v\n", cfg)
+
+	logger.Info(db.CreateCollection(context.Background(), "admins"))
 
 }

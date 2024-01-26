@@ -6,9 +6,6 @@ http:
 logger:
   level: 7
 
-mongo:
-  databaseName: testDatabase
-
 auth:
   accessTokenTTL: 7m
   refreshTokenTTL: 777m
