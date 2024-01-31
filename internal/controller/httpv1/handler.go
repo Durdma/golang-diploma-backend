@@ -2,32 +2,24 @@ package httpv1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
-
-	_ "sas/docs"
+	"sas/internal/service"
 )
 
 type Handler struct {
+	universitiesService service.Universities
+	editorsService      service.Editors
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(universitiesService service.Universities, editorsService service.Editors) *Handler {
+	return &Handler{
+		universitiesService: universitiesService,
+		editorsService:      editorsService,
+	}
 }
 
-func (h *Handler) Init() *gin.Engine {
-	router := gin.Default()
-	router.Use(
-		gin.Recovery(),
-		gin.Logger(),
-	)
-
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
-	return router
+func (h *Handler) Init(api *gin.RouterGroup) {
+	v1 := api.Group("/v1")
+	{
+		h.initEditorsRoutes(v1)
+	}
 }

@@ -12,14 +12,14 @@ type NewsEntity struct {
 
 // News - Сущность для новостных записей университета.
 type News struct {
-	ID          primitive.ObjectID `json:"id" bson:"id"`                   // id записи в MongoDB.
-	Header      string             `json:"header" bson:"header"`           // Заголовок новостной записи.
-	Description string             `json:"description" bson:"description"` // Краткое описание новостной записи.
-	Body        string             `json:"body" bson:"body"`               // Основной текст новостной записи.
-	ImageURL    string             `json:"image_url" bson:"image_url"`     // Ссылка на основное изображение новостной записи.
-	CreatedAt   int64              `json:"created_at" bson:"created_at"`   // Дата создания новостной записи.
-	UpdatedAt   int64              `json:"updated_at" bson:"updated_at"`   // Дата последнего обновления новостной записи.
-	Published   bool               `json:"published" bson:"published"`     // Статус публикации новостной записи.
-	CreatedBy   Editor             `json:"created_by" bson:"created_by"`   // Автор новостной записи.
-	UpdatedBy   []Editor           `json:"updated_by" bson:"updated_by"`   // Редакторы новостной записи.
+	ID          primitive.ObjectID  `json:"id" bson:"_id"`                  // id записи в MongoDB.
+	Header      string              `json:"header" bson:"header"`           // Заголовок новостной записи.
+	Description string              `json:"description" bson:"description"` // Краткое описание новостной записи.
+	Body        string              `json:"body" bson:"body"`               // Основной текст новостной записи.
+	ImageURL    string              `json:"image_url" bson:"image_url"`     // Ссылка на основное изображение новостной записи.
+	CreatedAt   primitive.Timestamp `json:"created_at" bson:"created_at"`   // Дата создания новостной записи.
+	UpdatedAt   primitive.Timestamp `json:"updated_at" bson:"updated_at"`   // Дата последнего обновления новостной записи.
+	Published   bool                `json:"published" bson:"published"`     // Статус публикации новостной записи.
+	CreatedBy   Editor              `json:"created_by" bson:"created_by"`   // Автор новостной записи.
+	UpdatedBy   []Editor            `json:"updated_by" bson:"updated_by"`   // Редакторы новостной записи.
 }

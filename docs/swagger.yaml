@@ -7,10 +7,6 @@ info:
   version: "1.0"
 paths: {}
 securityDefinitions:
-  AdminAuth:
-    in: header
-    name: Authorization
-    type: apiKey
   EditorsAuth:
     in: header
     name: Authorization

@@ -16,11 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {},
     "securityDefinitions": {
-        "AdminAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        },
         "EditorsAuth": {
             "type": "apiKey",
             "name": "Authorization",
