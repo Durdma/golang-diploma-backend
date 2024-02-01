@@ -2,6 +2,7 @@ package university
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 // University - Сущность для университетов, расположенных на платформе.
@@ -18,17 +19,17 @@ type University struct {
 
 // Editor - Сущность редактора контента на сайте университета.
 type Editor struct {
-	ID           primitive.ObjectID  `json:"id" bson:",omitempty"` // id записи в MongoDB.
-	Name         string              `json:"name" bson:"name"`
-	Email        string              `json:"email" bson:"email"`
-	Password     string              `json:"password" bson:"password"`
-	Verification Verification        `json:"verification" bson:"verification"` // Статус верификации университета на платформе.
-	RegisteredAt primitive.Timestamp `json:"registered_at" bson:"registered_at"`
-	LastVisitAt  primitive.Timestamp `json:"last_visit_at" bson:"last_visit_at"`
-	UniversityID primitive.ObjectID  `json:"university_id" bson:"university_id"`
+	ID           primitive.ObjectID `json:"id" bson:",omitempty"` // id записи в MongoDB.
+	Name         string             `json:"name" bson:"name"`
+	Email        string             `json:"email" bson:"email"`
+	Password     string             `json:"password" bson:"password"`
+	Verification Verification       `json:"verification" bson:"verification"` // Статус верификации
+	RegisteredAt time.Time          `json:"registered_at" bson:"registered_at"`
+	LastVisitAt  time.Time          `json:"last_visit_at" bson:"last_visit_at"`
+	UniversityID primitive.ObjectID `json:"university_id" bson:"university_id"`
 }
 
 type Verification struct {
-	Hash     string `json:"hash" bson:"hash"`
-	Verified bool   `json:"verified" bson:"verified"`
+	Hash     primitive.ObjectID `json:"hash" bson:"hash"`
+	Verified bool               `json:"verified" bson:"verified"`
 }

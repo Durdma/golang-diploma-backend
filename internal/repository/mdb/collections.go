@@ -1,5 +1,6 @@
 package mdb
 
+// Названия коллекций в БД mongoDB
 const (
 	usersCollection        = "users"
 	editorsCollection      = "editors"

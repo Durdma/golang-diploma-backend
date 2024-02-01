@@ -7,21 +7,25 @@ import (
 	"sas/pkg/logger"
 )
 
+// initEditorsRoutes - Инициализация группы роутера для редакторов сайта университета
 func (h *Handler) initEditorsRoutes(api *gin.RouterGroup) {
+	// Группирует все маршруты редакторов
 	editors := api.Group("/editors", h.setUniversityFromRequest())
 	{
-		editors.POST("/sign-up", h.editorsSignUp)
-		editors.POST("/sign-in")
-		editors.POST("/verify/:hash")
+		editors.POST("/sign-up", h.editorsSignUp)     // Регистрация нового редактора сайта
+		editors.POST("/sign-in")                      // Вход редактора на сайт
+		editors.POST("/verify/:hash", h.editorVerify) // Подтверждение учетной записи редактора
 	}
 }
 
+// editorsSignUpInput - структура, в которую парсится тело запроса на регистрацию редактора
 type editorsSignUpInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password string `json:"hash"`
 }
 
+// editorsSignUp - Парсит тело полученного запроса в структуру и получает домен университета, от которого пришел запрос
 func (h *Handler) editorsSignUp(ctx *gin.Context) {
 	var input editorsSignUpInput
 	if err := ctx.BindJSON(&input); err != nil {
@@ -47,4 +51,20 @@ func (h *Handler) editorsSignUp(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusCreated)
+}
+
+// editorVerify - Подтверждение создания учетной записи редактора
+func (h *Handler) editorVerify(ctx *gin.Context) {
+	hash := ctx.Param("hash")
+	if hash == "" {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	if err := h.editorsService.Verify(ctx.Request.Context(), hash); err != nil {
+		logger.Error(err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+	}
+
+	ctx.Status(http.StatusOK)
 }

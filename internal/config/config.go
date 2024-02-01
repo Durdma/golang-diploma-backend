@@ -53,7 +53,7 @@ type HTTPConfig struct {
 }
 
 // Init - функция, создает конфиг из переменных окружения
-// На вход подается файл .env в котором описываются значения конфигурации
+// На вход подается путь до файлов конфигурации всего приложения и переменных окружения с чувствительной информацией
 // Если указаны не все параметры конфигурации, то используются дефолтные константы
 func Init(path string, envPath string) (*Config, error) {
 	setDefaults()
@@ -124,7 +124,7 @@ func unmarshalEnv(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("password_salt", &cfg.Auth.PasswordSalt); err != nil {
+	if err := viper.UnmarshalKey("hash_salt", &cfg.Auth.PasswordSalt); err != nil {
 		return err
 	}
 

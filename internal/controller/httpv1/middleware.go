@@ -2,7 +2,6 @@ package httpv1
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sas/internal/models/university"
@@ -14,10 +13,11 @@ const (
 	universityCtx = "university"
 )
 
+// setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
 func (h *Handler) setUniversityFromRequest() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		domainName := strings.Split(ctx.Request.Host, ":")[0]
-		fmt.Println(domainName)
+		//fmt.Println(domainName)
 		univ, err := h.universitiesService.GetByDomain(ctx.Request.Context(), domainName)
 		if err != nil {
 			logger.Error(err)
@@ -30,6 +30,7 @@ func (h *Handler) setUniversityFromRequest() gin.HandlerFunc {
 	}
 }
 
+// getUniversityFromContext - Получение имени университета из контекста запроса
 func getUniversityFromContext(ctx *gin.Context) (university.University, error) {
 	value, ex := ctx.Get(universityCtx)
 	if !ex {

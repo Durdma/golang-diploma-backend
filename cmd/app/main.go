@@ -17,9 +17,10 @@ import "sas/internal/app"
 // @in header
 // @name Authorization
 
-const configPath = "..\\..\\configs\\main"
-const envPath = "../../app"
+const configPath = "..\\..\\configs\\main" // configPath - путь к конфигу параметров API
+const envPath = "../../app"                // envPath - путь к переменным окружения, где хранится чувствительная информация. НЕ ЗАЛИВАТЬ НА ГИТ!!!
 
+// main - запуск всего приложения
 func main() {
 	app.Run(configPath, envPath)
 }

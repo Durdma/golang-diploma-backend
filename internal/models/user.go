@@ -17,7 +17,7 @@ type User struct {
 	ID           primitive.ObjectID      `json:"id" bson:"_id"` // id записи в MongoBD.
 	Name         string                  `json:"name" bson:"name"`
 	Email        string                  `json:"email" bson:"email"`
-	Password     string                  `json:"password" bson:"password"`
+	Password     string                  `json:"hash" bson:"hash"`
 	RegisteredAt primitive.Timestamp     `json:"registered_at" bson:"registered_at"` // Дата регистрации
 	Universities []university.University `json:"universities" bson:"universities"`
 	//BaseUser

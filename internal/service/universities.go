@@ -8,11 +8,13 @@ import (
 	"sas/pkg/logger"
 )
 
+// UniversitiesService - Структура для работы с сервисом университетов
 type UniversitiesService struct {
 	repo  repository.Universities
 	cache cache.Cache
 }
 
+// NewUniversitiesService - Создание структуры сервиса университетов
 func NewUniversitiesService(repo repository.Universities, cache cache.Cache) *UniversitiesService {
 	return &UniversitiesService{
 		repo:  repo,
@@ -20,6 +22,7 @@ func NewUniversitiesService(repo repository.Universities, cache cache.Cache) *Un
 	}
 }
 
+// GetByDomain - Получение из БД записи об университете по полученному домену
 func (s *UniversitiesService) GetByDomain(ctx context.Context, domainName string) (university.University, error) {
 	if value, err := s.cache.Get(domainName); err == nil {
 		return value.(university.University), nil
