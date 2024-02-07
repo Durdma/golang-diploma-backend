@@ -12,6 +12,7 @@ import (
 	"sas/internal/service"
 	"sas/pkg/cache"
 	"sas/pkg/database/mongodb"
+	"sas/pkg/email"
 	"sas/pkg/hash"
 	"sas/pkg/logger"
 	"syscall"
@@ -48,14 +49,15 @@ func Run(configPath string, envPath string) {
 
 	db := mongoClient.Database(cfg.Mongo.DatabaseName)
 	// Подключение кэша
-	memCache := cache.NewMemoryCache()
+	memCache := cache.NewMemoryCache(int64(cfg.CacheTTL))
 	// Подключение хэша
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
 
+	emailProvider := email.NewClient(cfg.Email.Email, cfg.Email.Password, cfg.Email.Provider, cfg.Email.Port)
 	// Подключение репозиториев
 	repos := repository.NewRepositories(db)
 	// Подключение сервисов
-	services := service.NewServices(repos, memCache, hasher)
+	services := service.NewServices(repos, memCache, hasher, emailProvider)
 
 	// Добавление контроллера
 	handlers := controller.NewHandler(services.Universities, services.Editors)

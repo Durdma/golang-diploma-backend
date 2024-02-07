@@ -16,7 +16,7 @@ type Universities interface {
 type Editors interface {
 	Create(ctx context.Context, editor university.Editor) error
 	GetByCredentials(ctx context.Context, email, password university.Editor) error
-	Verify(ctx context.Context, hash string) error
+	Verify(ctx context.Context, code string) error
 }
 
 // Repositories - структура со всеми репозиториями

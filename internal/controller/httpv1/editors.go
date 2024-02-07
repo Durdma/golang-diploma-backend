@@ -12,9 +12,9 @@ func (h *Handler) initEditorsRoutes(api *gin.RouterGroup) {
 	// Группирует все маршруты редакторов
 	editors := api.Group("/editors", h.setUniversityFromRequest())
 	{
-		editors.POST("/sign-up", h.editorsSignUp)     // Регистрация нового редактора сайта
-		editors.POST("/sign-in")                      // Вход редактора на сайт
-		editors.POST("/verify/:hash", h.editorVerify) // Подтверждение учетной записи редактора
+		editors.POST("/sign-up", h.editorsSignUp)    // Регистрация нового редактора сайта
+		editors.POST("/sign-in")                     // Вход редактора на сайт
+		editors.GET("/verify/:hash", h.editorVerify) // Подтверждение учетной записи редактора ПОКА ИЗМЕНЕНО НА GET (POST изначально)
 	}
 }
 
@@ -48,6 +48,7 @@ func (h *Handler) editorsSignUp(ctx *gin.Context) {
 		logger.Error(err)
 
 		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
 
 	ctx.Status(http.StatusCreated)

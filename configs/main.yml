@@ -4,8 +4,15 @@ http:
   writeTimeout: 10s
 
 logger:
-  level: 10
+  level: 5
 
 auth:
   accessTokenTTL: 15m
   refreshTokenTTL: 43200m
+
+cache:
+  ttl: 3600s
+
+email:
+  provider: smtp.gmail.com
+  port: 587

@@ -9,3 +9,6 @@ logger:
 auth:
   accessTokenTTL: 7m
   refreshTokenTTL: 777m
+
+cache:
+  ttl: 777m

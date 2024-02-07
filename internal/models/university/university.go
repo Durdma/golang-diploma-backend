@@ -30,6 +30,6 @@ type Editor struct {
 }
 
 type Verification struct {
-	Hash     primitive.ObjectID `json:"hash" bson:"hash"`
+	Code     primitive.ObjectID `json:"code" bson:"code"`
 	Verified bool               `json:"verified" bson:"verified"`
 }

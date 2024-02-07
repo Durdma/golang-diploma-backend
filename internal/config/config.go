@@ -21,7 +21,9 @@ type Config struct {
 	Mongo       MongoConfig
 	HTTP        HTTPConfig
 	Auth        AuthConfig
+	Email       EmailConfig
 	LoggerLevel int
+	CacheTTL    time.Duration
 }
 
 // MongoConfig - Конфиг MongoDB
@@ -50,6 +52,16 @@ type HTTPConfig struct {
 	Port         string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+}
+
+type EmailConfig struct {
+	ListID       string
+	ClientID     string
+	ClientSecret string
+	Provider     string
+	Port         string
+	Email        string
+	Password     string
 }
 
 // Init - функция, создает конфиг из переменных окружения
@@ -103,6 +115,18 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
+	if err := viper.UnmarshalKey("cache.ttl", &cfg.CacheTTL); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("email.provider", &cfg.Email.Provider); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("email.port", &cfg.Email.Port); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -125,6 +149,26 @@ func unmarshalEnv(cfg *Config) error {
 	}
 
 	if err := viper.UnmarshalKey("hash_salt", &cfg.Auth.PasswordSalt); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("secret", &cfg.Email.ClientSecret); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("id", &cfg.Email.ClientID); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("list_id", &cfg.Email.ListID); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("email_sender", &cfg.Email.Email); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("email_password", &cfg.Email.Password); err != nil {
 		return err
 	}
 

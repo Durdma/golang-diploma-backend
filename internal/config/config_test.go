@@ -28,6 +28,7 @@ func TestInit(t *testing.T) {
 			},
 			want: &Config{
 				LoggerLevel: 7,
+				CacheTTL:    time.Minute * 777,
 				HTTP: HTTPConfig{
 					Port:         "7777",
 					ReadTimeout:  time.Second * 77,
@@ -46,6 +47,11 @@ func TestInit(t *testing.T) {
 					URI:          "mongodb://localhost:27017/test",
 					User:         "Tester",
 					Password:     "test",
+				},
+				Email: EmailConfig{
+					ClientSecret: "test_secret",
+					ClientID:     "321",
+					ListID:       "666",
 				},
 			},
 		},
