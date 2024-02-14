@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sas/internal/models/university"
+	"sas/internal/models"
 	"sas/pkg/logger"
 	"strings"
 )
@@ -31,15 +31,15 @@ func (h *Handler) setUniversityFromRequest() gin.HandlerFunc {
 }
 
 // getUniversityFromContext - Получение имени университета из контекста запроса
-func getUniversityFromContext(ctx *gin.Context) (university.University, error) {
+func getUniversityFromContext(ctx *gin.Context) (models.University, error) {
 	value, ex := ctx.Get(universityCtx)
 	if !ex {
-		return university.University{}, errors.New("university is missing from context")
+		return models.University{}, errors.New("university is missing from context")
 	}
 
-	univ, ok := value.(university.University)
+	univ, ok := value.(models.University)
 	if !ok {
-		return university.University{}, errors.New("failed to convert value from ctx to university.University")
+		return models.University{}, errors.New("failed to convert value from ctx to university.University")
 	}
 
 	return univ, nil

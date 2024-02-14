@@ -2,6 +2,7 @@ package university
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sas/internal/models"
 )
 
 type CourseEntity struct {
@@ -23,8 +24,8 @@ type Course struct {
 	CreatedAt    primitive.Timestamp `json:"created_at" bson:"created_at"`       // Дата создания записи.
 	UpdatedAt    primitive.Timestamp `json:"updated_at" bson:"updated_at"`       // Дата изменения записи.
 	Published    bool                `json:"published" bson:"published"`         // Статус публикации записи.
-	CreatedBy    Editor              `json:"created_by" bson:"created_by"`       // Автор записи.
-	UpdatedBy    []Editor            `json:"updated_by" bson:"updated_by"`       // Редакторы записи.
+	CreatedBy    models.Editor       `json:"created_by" bson:"created_by"`       // Автор записи.
+	UpdatedBy    []models.Editor     `json:"updated_by" bson:"updated_by"`       // Редакторы записи.
 }
 
 // Degree - Уровень образовательной программы.

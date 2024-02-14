@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"sas/internal/models/university"
+	"sas/internal/models"
 	"sas/internal/repository"
 	"sas/pkg/cache"
 	"sas/pkg/logger"
@@ -23,16 +23,16 @@ func NewUniversitiesService(repo repository.Universities, cache cache.Cache) *Un
 }
 
 // GetByDomain - Получение из БД записи об университете по полученному домену
-func (s *UniversitiesService) GetByDomain(ctx context.Context, domainName string) (university.University, error) {
+func (s *UniversitiesService) GetByDomain(ctx context.Context, domainName string) (models.University, error) {
 	if value, err := s.cache.Get(domainName); err == nil {
-		return value.(university.University), nil
+		return value.(models.University), nil
 	}
 
 	logger.Info(domainName)
 
 	univ, err := s.repo.GetByDomain(ctx, domainName)
 	if err != nil {
-		return university.University{}, err
+		return models.University{}, err
 	}
 
 	s.cache.Set(domainName, univ)

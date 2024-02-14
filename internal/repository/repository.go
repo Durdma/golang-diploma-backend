@@ -3,19 +3,19 @@ package repository
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
-	"sas/internal/models/university"
+	"sas/internal/models"
 	"sas/internal/repository/mdb"
 )
 
 // Universities - Интерфейс для репозитория университетов
 type Universities interface {
-	GetByDomain(ctx context.Context, domain string) (university.University, error)
+	GetByDomain(ctx context.Context, domain string) (models.University, error)
 }
 
 // Editors - Интерфейс для репозитория редакторов
 type Editors interface {
-	Create(ctx context.Context, editor university.Editor) error
-	GetByCredentials(ctx context.Context, email, password university.Editor) error
+	Create(ctx context.Context, editor models.Editor) error
+	GetByCredentials(ctx context.Context, email, password models.Editor) error
 	Verify(ctx context.Context, code string) error
 }
 

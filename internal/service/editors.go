@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"sas/internal/models/university"
+	"sas/internal/models"
 	"sas/internal/repository"
 	"sas/pkg/hash"
 	"time"
@@ -32,16 +32,16 @@ func (s *EditorsService) SignIn(ctx context.Context, email string, password stri
 
 // SignUp - Регистрация нового редактора на сайте университета
 func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) error {
-	hashedCode := primitive.NewObjectID()
-	editor := university.Editor{
+	verificationCode := primitive.NewObjectID()
+	editor := models.Editor{
 		Name:         input.Name,
 		Password:     s.hasher.Hash(input.Password),
 		Email:        input.Email,
 		RegisteredAt: time.Now(),
 		LastVisitAt:  time.Now(),
 		UniversityID: input.UniversityID,
-		Verification: university.Verification{
-			Code: hashedCode,
+		Verification: models.Verification{
+			Code: verificationCode,
 		},
 	}
 
@@ -52,7 +52,7 @@ func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) er
 	return s.emailService.AddToList(AddToListInput{
 		Email:            input.Email,
 		Name:             input.Name,
-		VerificationCode: hashedCode.Hex(),
+		VerificationCode: verificationCode.Hex(),
 	})
 }
 

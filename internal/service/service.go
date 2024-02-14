@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"sas/internal/models/university"
+	"sas/internal/models"
 	"sas/internal/repository"
 	"sas/pkg/cache"
 	"sas/pkg/email"
@@ -12,7 +12,7 @@ import (
 
 // Universities - Интерфейс для взаимодействия с сервисом университетов
 type Universities interface {
-	GetByDomain(ctx context.Context, domainName string) (university.University, error)
+	GetByDomain(ctx context.Context, domainName string) (models.University, error)
 }
 
 // EditorSignUpInput TODO Взято из примера для понимания, при добавлении редакторов переписать
@@ -22,6 +22,11 @@ type EditorSignUpInput struct {
 	Email        string
 	Password     string
 	UniversityID primitive.ObjectID
+}
+
+type SignInResult struct {
+	AccessToken  string
+	RefreshToken string
 }
 
 type EditorSignInInput struct {

@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"sas/internal/models/university"
+	"sas/internal/models"
 )
 
 // EditorsRepo - Структура для работы с коллекцией из mongoDB
@@ -24,13 +24,13 @@ func NewEditorsRepo(db *mongo.Database) *EditorsRepo {
 }
 
 // Create - Добавление записи о новом редакторе в коллекцию
-func (r *EditorsRepo) Create(ctx context.Context, editor university.Editor) error {
+func (r *EditorsRepo) Create(ctx context.Context, editor models.Editor) error {
 	_, err := r.db.InsertOne(ctx, editor)
 	return err
 }
 
 // GetByCredentials - Получение записи из коллекции по определенным полям
-func (r *EditorsRepo) GetByCredentials(ctx context.Context, email, password university.Editor) error {
+func (r *EditorsRepo) GetByCredentials(ctx context.Context, email, password models.Editor) error {
 	return nil
 }
 

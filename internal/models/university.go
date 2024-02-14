@@ -1,4 +1,4 @@
-package university
+package models
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,6 +27,7 @@ type Editor struct {
 	RegisteredAt time.Time          `json:"registered_at" bson:"registered_at"`
 	LastVisitAt  time.Time          `json:"last_visit_at" bson:"last_visit_at"`
 	UniversityID primitive.ObjectID `json:"university_id" bson:"university_id"`
+	Session      Session            `json:"session" bson:"session"`
 }
 
 type Verification struct {

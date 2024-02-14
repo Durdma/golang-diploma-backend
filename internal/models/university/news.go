@@ -2,6 +2,7 @@ package university
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sas/internal/models"
 )
 
 type NewsEntity struct {
@@ -20,6 +21,6 @@ type News struct {
 	CreatedAt   primitive.Timestamp `json:"created_at" bson:"created_at"`   // Дата создания новостной записи.
 	UpdatedAt   primitive.Timestamp `json:"updated_at" bson:"updated_at"`   // Дата последнего обновления новостной записи.
 	Published   bool                `json:"published" bson:"published"`     // Статус публикации новостной записи.
-	CreatedBy   Editor              `json:"created_by" bson:"created_by"`   // Автор новостной записи.
-	UpdatedBy   []Editor            `json:"updated_by" bson:"updated_by"`   // Редакторы новостной записи.
+	CreatedBy   models.Editor       `json:"created_by" bson:"created_by"`   // Автор новостной записи.
+	UpdatedBy   []models.Editor     `json:"updated_by" bson:"updated_by"`   // Редакторы новостной записи.
 }

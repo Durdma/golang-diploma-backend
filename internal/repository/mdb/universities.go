@@ -4,7 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"sas/internal/models/university"
+	"sas/internal/models"
 )
 
 // UniversityRepo - Структура для работы с коллекцией из mongoDB
@@ -20,8 +20,8 @@ func NewUniversityRepo(db *mongo.Database) *UniversityRepo {
 }
 
 // GetByDomain - Получение записи об университете по имени домена
-func (r *UniversityRepo) GetByDomain(ctx context.Context, domainName string) (university.University, error) {
-	var univ university.University
+func (r *UniversityRepo) GetByDomain(ctx context.Context, domainName string) (models.University, error) {
+	var univ models.University
 	err := r.db.FindOne(ctx, bson.M{
 		"domain": domainName,
 	}).Decode(&univ)

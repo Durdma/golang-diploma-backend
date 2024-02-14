@@ -2,6 +2,7 @@ package university
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sas/internal/models"
 )
 
 type StructEntity struct {
@@ -19,8 +20,8 @@ type Institute struct {
 	CreatedAt   primitive.Timestamp `json:"created_at" bson:"created_at"`   // Дата создания записи об институте.
 	UpdatedAt   primitive.Timestamp `json:"updated_at" bson:"updated_at"`   // Дата последнего обновления записи об институте.
 	Published   bool                `json:"published" bson:"published"`     // Статус публикации записи об институте.
-	CreatedBy   Editor              `json:"created_by" bson:"created_by"`   // Автор записи об институте.
-	UpdatedBy   []Editor            `json:"updated_by" bson:"updated_by"`   // Редакторы записи об институте.
+	CreatedBy   models.Editor       `json:"created_by" bson:"created_by"`   // Автор записи об институте.
+	UpdatedBy   []models.Editor     `json:"updated_by" bson:"updated_by"`   // Редакторы записи об институте.
 }
 
 // Department - Сущность для описания кафедры института.
@@ -33,8 +34,8 @@ type Department struct {
 	CreatedAt   primitive.Timestamp `json:"created_at" bson:"created_at"`   // Дата создания записи о кафедре.
 	UpdatedAt   primitive.Timestamp `json:"updated_at" bson:"updated_at"`   // Дата последнего обновления записи о кафедре.
 	Published   bool                `json:"published" bson:"published"`     // Статус публикации записи о кафедре.
-	CreatedBy   Editor              `json:"created_by" bson:"created_by"`   // Автор записи о кафедре.
-	UpdatedBy   []Editor            `json:"updated_by" bson:"updated_by"`   // Редакторы записи о кафедре.
+	CreatedBy   models.Editor       `json:"created_by" bson:"created_by"`   // Автор записи о кафедре.
+	UpdatedBy   []models.Editor     `json:"updated_by" bson:"updated_by"`   // Редакторы записи о кафедре.
 }
 
 // Person - Сущность для описания сотрудника университета (информационная запись).
