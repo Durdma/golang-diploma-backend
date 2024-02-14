@@ -5,9 +5,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"sas/internal/models"
 	"sas/internal/repository"
+	"sas/pkg/auth"
 	"sas/pkg/cache"
 	"sas/pkg/email"
 	"sas/pkg/hash"
+	"time"
 )
 
 // Universities - Интерфейс для взаимодействия с сервисом университетов
@@ -35,10 +37,16 @@ type EditorSignInInput struct {
 	UniversityID primitive.ObjectID
 }
 
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
+
 // Editors - Интерфейс для сервиса редакторов
 type Editors interface {
-	SignIn(ctx context.Context, email string, password string) (string, error)
+	SignIn(ctx context.Context, input EditorSignInInput) (Tokens, error)
 	SignUp(ctx context.Context, input EditorSignUpInput) error
+	RefreshTokens(ctx context.Context, university primitive.ObjectID, refreshToken string) (Tokens, error)
 	Verify(ctx context.Context, hash string) error
 }
 
@@ -59,10 +67,12 @@ type Services struct {
 }
 
 // NewServices - Создание нового сервиса
-func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.PasswordHasher, emailProvider email.Provider) *Services {
+func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.PasswordHasher,
+	tokenManager auth.TokenManager, emailProvider email.Provider, accessTTL time.Duration,
+	refreshTTL time.Duration) *Services {
 	emailService := NewEmailsService(emailProvider, "")
 	return &Services{
 		Universities: NewUniversitiesService(repos.Universities, cache),
-		Editors:      NewEditorsService(repos.Editors, hasher, emailService),
+		Editors:      NewEditorsService(repos.Editors, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 	}
 }

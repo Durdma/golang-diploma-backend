@@ -10,13 +10,12 @@ import (
 
 type TokenManager interface {
 	NewJWT(userId string, ttl time.Duration) (string, error)
-	Parse(accessToken string) string
+	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
 
 type Manager struct {
 	signingKey string
-	rand       *rand.Rand
 }
 
 func NewManager(signingKey string) (*Manager, error) {
@@ -24,10 +23,7 @@ func NewManager(signingKey string) (*Manager, error) {
 		return nil, errors.New("empty signing key")
 	}
 
-	r := &rand.Rand{}
-	r.Seed(time.Now().Unix())
-
-	return &Manager{signingKey: signingKey, rand: r}, nil
+	return &Manager{signingKey: signingKey}, nil
 }
 
 func (m *Manager) NewJWT(userId string, ttl time.Duration) (string, error) {
@@ -60,7 +56,11 @@ func (m *Manager) Parse(accessToken string) (string, error) {
 
 func (m *Manager) NewRefreshToken() (string, error) {
 	b := make([]byte, 32)
-	_, err := m.rand.Read(b)
+
+	s := rand.NewSource(time.Now().Unix())
+	r := rand.New(s)
+
+	_, err := r.Read(b)
 	if err != nil {
 		return "", err
 	}

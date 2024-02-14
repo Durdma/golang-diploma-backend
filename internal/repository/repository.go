@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"sas/internal/models"
 	"sas/internal/repository/mdb"
@@ -15,7 +16,9 @@ type Universities interface {
 // Editors - Интерфейс для репозитория редакторов
 type Editors interface {
 	Create(ctx context.Context, editor models.Editor) error
-	GetByCredentials(ctx context.Context, email, password models.Editor) error
+	GetByCredentials(ctx context.Context, universityId primitive.ObjectID, email string, password string) (models.Editor, error)
+	GetByRefreshToken(ctx context.Context, universityId primitive.ObjectID, refreshToken string) (models.Editor, error)
+	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
 	Verify(ctx context.Context, code string) error
 }
 

@@ -10,6 +10,7 @@ import (
 	"sas/internal/repository"
 	"sas/internal/server"
 	"sas/internal/service"
+	"sas/pkg/auth"
 	"sas/pkg/cache"
 	"sas/pkg/database/mongodb"
 	"sas/pkg/email"
@@ -38,7 +39,8 @@ func Run(configPath string, envPath string) {
 	// Подтягивание конфигурации
 	cfg, err := config.Init(configPath, envPath)
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
 
 	// Вывод конфигурации приложения
@@ -53,11 +55,20 @@ func Run(configPath string, envPath string) {
 	// Подключение хэша
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
 
-	emailProvider := email.NewClient(cfg.Email.Email, cfg.Email.Password, cfg.Email.Provider, cfg.Email.Port)
+	emailProvider := email.NewClient(cfg.Email.Email, cfg.Email.Password, cfg.Email.Provider,
+		cfg.Email.Port)
+
+	tokenManager, err := auth.NewManager(cfg.Auth.JWT.SigningKey)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
 	// Подключение репозиториев
 	repos := repository.NewRepositories(db)
 	// Подключение сервисов
-	services := service.NewServices(repos, memCache, hasher, emailProvider)
+	services := service.NewServices(repos, memCache, hasher,
+		tokenManager, emailProvider, cfg.Auth.JWT.AccessTokenTTL, cfg.Auth.JWT.RefreshTokenTTL)
 
 	// Добавление контроллера
 	handlers := controller.NewHandler(services.Universities, services.Editors)

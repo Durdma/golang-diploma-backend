@@ -19,7 +19,7 @@ type University struct {
 
 // Editor - Сущность редактора контента на сайте университета.
 type Editor struct {
-	ID           primitive.ObjectID `json:"id" bson:",omitempty"` // id записи в MongoDB.
+	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"` // id записи в MongoDB.
 	Name         string             `json:"name" bson:"name"`
 	Email        string             `json:"email" bson:"email"`
 	Password     string             `json:"password" bson:"password"`
