@@ -48,10 +48,11 @@ func Run(configPath string, envPath string) {
 
 	// Подключение к mongoDB
 	mongoClient := mongodb.NewClient("mongodb://localhost:27017", "", "")
-
 	db := mongoClient.Database(cfg.Mongo.DatabaseName)
+
 	// Подключение кэша
 	memCache := cache.NewMemoryCache(int64(cfg.CacheTTL))
+
 	// Подключение хэша
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
 
@@ -71,7 +72,7 @@ func Run(configPath string, envPath string) {
 		tokenManager, emailProvider, cfg.Auth.JWT.AccessTokenTTL, cfg.Auth.JWT.RefreshTokenTTL)
 
 	// Добавление контроллера
-	handlers := controller.NewHandler(services.Universities, services.Editors)
+	handlers := controller.NewHandler(services.Universities, services.Editors, tokenManager)
 
 	// Инициализация сервера и его запуск
 	srv := server.NewServer(cfg, handlers.Init())

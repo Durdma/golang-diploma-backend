@@ -13,10 +13,11 @@ import (
 
 // EditorsService - Структура сервиса редакторов
 type EditorsService struct {
-	repo            repository.Editors
-	hasher          hash.PasswordHasher
-	tokenManager    auth.TokenManager
-	emailService    Emails
+	repo         repository.Editors
+	hasher       hash.PasswordHasher
+	tokenManager auth.TokenManager
+	emailService Emails
+
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 }

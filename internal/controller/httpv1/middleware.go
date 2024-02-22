@@ -10,24 +10,23 @@ import (
 )
 
 const (
-	universityCtx = "university"
+	authorizationHeader = "Authorization"
+	userCtx             = "userId"
+	universityCtx       = "university"
 )
 
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
-func (h *Handler) setUniversityFromRequest() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		domainName := strings.Split(ctx.Request.Host, ":")[0]
-		//fmt.Println(domainName)
-		univ, err := h.universitiesService.GetByDomain(ctx.Request.Context(), domainName)
-		if err != nil {
-			logger.Error(err)
+func (h *Handler) setUniversityFromRequest(ctx *gin.Context) {
+	domainName := strings.Split(ctx.Request.Host, ":")[0]
 
-			ctx.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-
-		ctx.Set(universityCtx, univ)
+	univ, err := h.universitiesService.GetByDomain(ctx.Request.Context(), domainName)
+	if err != nil {
+		logger.Error(err)
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
 	}
+
+	ctx.Set(universityCtx, univ)
 }
 
 // getUniversityFromContext - Получение имени университета из контекста запроса
@@ -43,4 +42,45 @@ func getUniversityFromContext(ctx *gin.Context) (models.University, error) {
 	}
 
 	return univ, nil
+}
+
+func (h *Handler) userIdentity(ctx *gin.Context) {
+	header := ctx.GetHeader(authorizationHeader)
+	if header == "" {
+		newErrorResponse(ctx, http.StatusUnauthorized, "empty auth header")
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		newErrorResponse(ctx, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
+
+	if len(headerParts[1]) == 0 {
+		newErrorResponse(ctx, http.StatusUnauthorized, "token is empty")
+		return
+	}
+
+	userId, err := h.tokenManager.Parse(headerParts[1])
+	if err != nil {
+		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	ctx.Set(userCtx, userId)
+}
+
+func getUserId(ctx *gin.Context) (string, error) {
+	id, ok := ctx.Get(userCtx)
+	if !ok {
+		return "", errors.New("user id not found")
+	}
+
+	idStr, ok := id.(string)
+	if !ok {
+		return "", errors.New("user id is of invalid type")
+	}
+
+	return idStr, nil
 }

@@ -26,11 +26,6 @@ type EditorSignUpInput struct {
 	UniversityID primitive.ObjectID
 }
 
-type SignInResult struct {
-	AccessToken  string
-	RefreshToken string
-}
-
 type EditorSignInInput struct {
 	Email        string
 	Password     string

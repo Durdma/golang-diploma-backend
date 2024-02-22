@@ -1,12 +1,366 @@
 basePath: /
+definitions:
+  httpv1.editorsSignInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  httpv1.editorsSignUpInput:
+    properties:
+      email:
+        type: string
+      hash:
+        type: string
+      name:
+        type: string
+    required:
+    - email
+    - hash
+    - name
+    type: object
+  httpv1.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  httpv1.refreshInput:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  httpv1.tokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Editor:
+    properties:
+      email:
+        type: string
+      id:
+        description: id записи в MongoDB.
+        type: string
+      last_visit_at:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      registered_at:
+        type: string
+      session:
+        $ref: '#/definitions/models.Session'
+      university_id:
+        type: string
+      verification:
+        allOf:
+        - $ref: '#/definitions/models.Verification'
+        description: Статус верификации
+    type: object
+  models.Session:
+    properties:
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Verification:
+    properties:
+      code:
+        type: string
+      verified:
+        type: boolean
+    type: object
+  university.News:
+    properties:
+      body:
+        description: Основной текст новостной записи.
+        type: string
+      created_at:
+        description: Дата создания новостной записи.
+        type: string
+      created_by:
+        allOf:
+        - $ref: '#/definitions/models.Editor'
+        description: Автор новостной записи.
+      description:
+        description: Краткое описание новостной записи.
+        type: string
+      header:
+        description: Заголовок новостной записи.
+        type: string
+      id:
+        description: id записи в MongoDB.
+        type: string
+      image_url:
+        description: Ссылка на основное изображение новостной записи.
+        type: string
+      published:
+        description: Статус публикации новостной записи.
+        type: boolean
+      updated_at:
+        description: Дата последнего обновления новостной записи.
+        type: string
+      updated_by:
+        description: Редакторы новостной записи.
+        items:
+          $ref: '#/definitions/models.Editor'
+        type: array
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: API Server for University Platform
   title: University Platform API
   version: "1.0"
-paths: {}
+paths:
+  /editors/news:
+    get:
+      consumes:
+      - application/json
+      description: editor get all news
+      operationId: editorGetAllNews
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/university.News'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      security:
+      - EditorsAuth: []
+      summary: Editor Get All News
+      tags:
+      - editors
+  /editors/news/{id}:
+    get:
+      consumes:
+      - application/json
+      description: editor get news by id
+      operationId: editorsGetNewsById
+      parameters:
+      - description: news id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/university.News'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      security:
+      - EditorsAuth: []
+      summary: Editor Get News By ID
+      tags:
+      - editors
+  /editors/refresh:
+    post:
+      consumes:
+      - application/json
+      description: editor refresh tokens
+      operationId: editorRefresh
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/httpv1.refreshInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpv1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      security:
+      - EditorsAuth: []
+      summary: Editor Refresh Token
+      tags:
+      - editors
+  /editors/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: editor sign in
+      operationId: editorSignIn
+      parameters:
+      - description: sign in info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/httpv1.editorsSignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpv1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      summary: Editor SignIn
+      tags:
+      - editors
+  /editors/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create editor account
+      operationId: editorSignUp
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/httpv1.editorsSignUpInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      summary: Editor SignUp
+      tags:
+      - editors
+  /editors/verify/{code}:
+    post:
+      consumes:
+      - application/json
+      description: editor verify registration
+      operationId: editorVerify
+      parameters:
+      - description: verification code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpv1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      summary: Editor Verify Registration
+      tags:
+      - editors
 securityDefinitions:
+  AdminAuth:
+    in: header
+    name: Authorization
+    type: apiKey
   EditorsAuth:
     in: header
     name: Authorization

@@ -27,7 +27,7 @@ func NewClient(uri string, username string, password string) *mongo.Client {
 	// Тестовый запрос к БД
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return client
