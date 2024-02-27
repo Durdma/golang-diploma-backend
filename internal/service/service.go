@@ -17,6 +17,31 @@ type Universities interface {
 	GetByDomain(ctx context.Context, domainName string) (models.University, error)
 }
 
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+type AdminSignUpInput struct {
+	Name     string
+	Email    string
+	Password string
+	Domain   string
+}
+
+type AdminSignInInput struct {
+	Email    string
+	Password string
+	Domain   string
+}
+
+type Admins interface {
+	SignIn(ctx context.Context, input AdminSignInInput) (Tokens, error)
+	SignUp(ctx context.Context, input AdminSignUpInput) error
+	RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error)
+	Verify(ctx context.Context, hash string) error
+}
+
 // EditorSignUpInput TODO Взято из примера для понимания, при добавлении редакторов переписать
 // EditorSignUpInput - Структура для парсинга данных при регистрации в go-объект из json
 type EditorSignUpInput struct {
@@ -30,11 +55,6 @@ type EditorSignInInput struct {
 	Email        string
 	Password     string
 	UniversityID primitive.ObjectID
-}
-
-type Tokens struct {
-	AccessToken  string
-	RefreshToken string
 }
 
 // Editors - Интерфейс для сервиса редакторов

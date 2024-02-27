@@ -10,14 +10,17 @@ import (
 type Handler struct {
 	universitiesService service.Universities // Сервис для работы с логикой университетов
 	editorsService      service.Editors      // Сервис для работы с логикой редакторов
+	adminsService       service.Admins
 	tokenManager        auth.TokenManager
 }
 
 // NewHandler - Создание обработчика событий. На вход передаем уже инициализированные сервисы
-func NewHandler(universitiesService service.Universities, editorsService service.Editors, tokenManager auth.TokenManager) *Handler {
+func NewHandler(universitiesService service.Universities, editorsService service.Editors,
+	adminsService service.Admins, tokenManager auth.TokenManager) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
+		adminsService:       adminsService,
 		tokenManager:        tokenManager,
 	}
 }
@@ -27,5 +30,6 @@ func (h *Handler) Init(api *gin.RouterGroup) {
 	v1 := api.Group("/v1")
 	{
 		h.initEditorsRoutes(v1)
+		h.initAdminsRoutes(v1)
 	}
 }

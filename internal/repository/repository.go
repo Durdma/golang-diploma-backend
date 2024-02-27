@@ -22,6 +22,14 @@ type Editors interface {
 	Verify(ctx context.Context, code string) error
 }
 
+type Admins interface {
+	Create(ctx context.Context, admin models.Admin) error
+	GetByCredentials(ctx context.Context, email string, password string) (models.Admin, error)
+	GetByRefreshToken(ctx context.Context, refreshToken string) (models.Admin, error)
+	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
+	Verify(ctx context.Context, code string) error
+}
+
 // Repositories - структура со всеми репозиториями
 type Repositories struct {
 	Universities Universities

@@ -54,7 +54,7 @@ func (r *EditorsRepo) GetByRefreshToken(ctx context.Context, universityId primit
 		"session.expires_at": bson.M{
 			"$gt": time.Now(),
 		},
-	}).Decode(editor)
+	}).Decode(&editor)
 
 	return editor, err
 }

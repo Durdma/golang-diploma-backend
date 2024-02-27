@@ -118,6 +118,7 @@ func (h *Handler) editorSignIn(ctx *gin.Context) {
 		logger.Error(err)
 
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	ctx.JSON(http.StatusOK, tokenResponse{

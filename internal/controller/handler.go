@@ -15,14 +15,17 @@ import (
 type Handler struct {
 	universitiesService service.Universities
 	editorsService      service.Editors
+	adminsService       service.Admins
 	tokenManager        auth.TokenManager
 }
 
 // NewHandler - Создание новой сущности обработчика событий
-func NewHandler(universitiesService service.Universities, editorsService service.Editors, tokenManager auth.TokenManager) *Handler {
+func NewHandler(universitiesService service.Universities, editorsService service.Editors,
+	adminsService service.Admins, tokenManager auth.TokenManager) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
+		adminsService:       adminsService,
 		tokenManager:        tokenManager,
 	}
 }
@@ -52,7 +55,7 @@ func (h *Handler) Init() *gin.Engine {
 
 // initAPI - Объединение в более общую группу роутеров
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.tokenManager)
+	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

@@ -30,8 +30,3 @@ type Editor struct {
 	UniversityID primitive.ObjectID `json:"university_id" bson:"university_id"`
 	Session      Session            `json:"session" bson:"session"`
 }
-
-type Verification struct {
-	Code     primitive.ObjectID `json:"code" bson:"code"`
-	Verified bool               `json:"verified" bson:"verified"`
-}
