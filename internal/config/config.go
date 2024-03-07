@@ -8,6 +8,7 @@ import (
 
 // Дефолтные значения параметров конфигурации
 const (
+	defaultHttpHost      = "localhost"
 	defaultHttpPort      = "8080"
 	defaultHttpRWTimeout = 10 * time.Second
 	//defaultHttpMaxHeaderMegabytes = 1
@@ -49,6 +50,7 @@ type JWTConfig struct {
 
 // HTTPConfig - Конфиг http подключения
 type HTTPConfig struct {
+	Host         string
 	Port         string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
@@ -93,6 +95,7 @@ func Init(path string, envPath string) (*Config, error) {
 
 // setDefaults - Устанавливает заданным полям конфигурации дефолтные значения
 func setDefaults() {
+	viper.SetDefault("http.host", defaultHttpHost)
 	viper.SetDefault("http.port", defaultHttpPort)
 	viper.SetDefault("http.timeout.read", defaultHttpRWTimeout)
 	viper.SetDefault("http.timeout.write", defaultHttpRWTimeout)

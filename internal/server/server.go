@@ -6,21 +6,6 @@ import (
 	"sas/internal/config"
 )
 
-// @title University Platform API
-// @version 1.0
-// @description API Server for University Platform
-
-// @host localhost:8080
-// @BasePath /
-
-// @securityDefinition.apikey AdminAuth
-// @in header
-// @name Authorization
-
-// @securityDefinitions.apikey EditorsAuth
-// @in header
-// @name Authorization
-
 // Server - Структура для работы с сервером
 type Server struct {
 	httpServer *http.Server

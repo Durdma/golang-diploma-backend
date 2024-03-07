@@ -66,21 +66,7 @@ definitions:
         - $ref: '#/definitions/models.Verification'
         description: Статус верификации
     type: object
-  models.Session:
-    properties:
-      expires_at:
-        type: string
-      refresh_token:
-        type: string
-    type: object
-  models.Verification:
-    properties:
-      code:
-        type: string
-      verified:
-        type: boolean
-    type: object
-  university.News:
+  models.News:
     properties:
       body:
         description: Основной текст новостной записи.
@@ -116,6 +102,20 @@ definitions:
           $ref: '#/definitions/models.Editor'
         type: array
     type: object
+  models.Session:
+    properties:
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Verification:
+    properties:
+      code:
+        type: string
+      verified:
+        type: boolean
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -136,7 +136,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/university.News'
+              $ref: '#/definitions/models.News'
             type: array
         "400":
           description: Bad Request
@@ -177,7 +177,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/university.News'
+            $ref: '#/definitions/models.News'
         "400":
           description: Bad Request
           schema:
@@ -318,8 +318,8 @@ paths:
       summary: Editor SignUp
       tags:
       - editors
-  /editors/verify/{code}:
-    post:
+  /editors/verify/{hash}:
+    get:
       consumes:
       - application/json
       description: editor verify registration

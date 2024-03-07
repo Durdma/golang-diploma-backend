@@ -40,7 +40,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/university.News"
+                                "$ref": "#/definitions/models.News"
                             }
                         }
                     },
@@ -103,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/university.News"
+                            "$ref": "#/definitions/models.News"
                         }
                     },
                     "400": {
@@ -315,8 +315,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/editors/verify/{code}": {
-            "post": {
+        "/editors/verify/{hash}": {
+            "get": {
                 "description": "editor verify registration",
                 "consumes": [
                     "application/json"
@@ -476,29 +476,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Session": {
-            "type": "object",
-            "properties": {
-                "expires_at": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Verification": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "verified": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "university.News": {
+        "models.News": {
             "type": "object",
             "properties": {
                 "body": {
@@ -547,6 +525,28 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.Editor"
                     }
+                }
+            }
+        },
+        "models.Session": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Verification": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
                 }
             }
         }
