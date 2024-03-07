@@ -131,7 +131,7 @@ type refreshInput struct {
 }
 
 // @Summary Editor Refresh Token
-// @Security EditorsAuth
+
 // @Tags editors
 // @Description editor refresh tokens
 // @ID editorRefresh
@@ -201,7 +201,6 @@ func (h *Handler) editorVerify(ctx *gin.Context) {
 
 // @Summary Editor Get All News
 // @Tags editors
-// @Security EditorsAuth
 // @Description editor get all news
 // @ID editorGetAllNews
 // @Accept json
@@ -230,7 +229,6 @@ func (h *Handler) editorGetAllNews(ctx *gin.Context) {
 
 // @Summary Editor Get News By ID
 // @Tags editors
-// @Security EditorsAuth
 // @Description editor get news by id
 // @ID editorsGetNewsById
 // @Accept json

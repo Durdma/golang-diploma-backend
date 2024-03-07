@@ -22,10 +22,17 @@ type Editors interface {
 	Verify(ctx context.Context, code string) error
 }
 
+type News interface {
+	Create(ctx context.Context, news models.News) error
+	Update(ctx context.Context, news models.News) error
+	Delete(ctx context.Context, newsId primitive.ObjectID) error
+}
+
 // Repositories - структура со всеми репозиториями
 type Repositories struct {
 	Universities Universities
 	Editors      Editors
+	News         News
 }
 
 // NewRepositories - Создание общего репозитория
@@ -33,5 +40,6 @@ func NewRepositories(db *mongo.Database) *Repositories {
 	return &Repositories{
 		Universities: mdb.NewUniversityRepo(db),
 		Editors:      mdb.NewEditorsRepo(db),
+		News:         mdb.NewNewsRepo(db),
 	}
 }
