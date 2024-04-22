@@ -15,6 +15,15 @@ const (
 	universityCtx       = "university"
 )
 
+// TODO Domain resolve middleware
+//func (h *Handler) setDomainFromRequest() gin.HandlerFunc {
+//	return func(ctx *gin.Context) {
+//		domainName := strings.Split(ctx.Request.Host, ":")[0]
+//
+//		domain, err :=
+//	}
+//}
+
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
 func (h *Handler) setUniversityFromRequest(ctx *gin.Context) {
 	domainName := strings.Split(ctx.Request.Host, ":")[0]

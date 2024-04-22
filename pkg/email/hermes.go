@@ -4,7 +4,7 @@ import (
 	"github.com/matcornic/hermes/v2"
 )
 
-// TODO Переработать логику составления сообщений
+// TODO Переработать логику составления сообщений, и общую логику работы
 // generateInfo TODO стилизует сообщение в зависимости от того с какого хоста пришло сообщение
 
 func generateInfo() hermes.Hermes {
