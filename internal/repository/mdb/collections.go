@@ -11,4 +11,5 @@ const (
 	infoCollection         = "info"
 	newsCollection         = "news"
 	structsCollection      = "structs"
+	domainsCollection      = "domains"
 )

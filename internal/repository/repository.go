@@ -8,6 +8,12 @@ import (
 	"sas/internal/repository/mdb"
 )
 
+type DNS interface {
+	Create(ctx context.Context, domain string) error
+	Delete(ctx context.Context, domain string) error
+	Get(ctx context.Context, domain string) (string, error)
+}
+
 // Universities - Интерфейс для репозитория университетов
 type Universities interface {
 	GetByDomain(ctx context.Context, domain string) (models.University, error)
@@ -42,6 +48,7 @@ type Repositories struct {
 	Universities Universities
 	Editors      Editors
 	News         News
+	DNS          DNS
 }
 
 // NewRepositories - Создание общего репозитория
@@ -51,5 +58,6 @@ func NewRepositories(db *mongo.Database) *Repositories {
 		Universities: mdb.NewUniversityRepo(db),
 		Editors:      mdb.NewEditorsRepo(db),
 		News:         mdb.NewNewsRepo(db),
+		DNS:          mdb.NewDNSRepo(db),
 	}
 }
