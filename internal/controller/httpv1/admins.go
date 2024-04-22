@@ -21,10 +21,11 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			sitesGroup.POST("/new")
 
 			sitesGroup.GET("/:id")
-			sitesGroup.PUT("/:id")
+			sitesGroup.PATCH("/:id")
 			sitesGroup.DELETE("/:id")
 		}
 
+		// Не в приоритете
 		requestsGroup := authenticated.Group("/requests")
 		{
 			requestsGroup.GET("")
@@ -33,7 +34,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			requestsGroup.POST("/new")
 
 			requestsGroup.GET("/:id")
-			requestsGroup.PUT("/:id")
+			requestsGroup.PATCH("/:id")
 			requestsGroup.DELETE("/:id")
 		}
 
@@ -45,10 +46,11 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			employeesGroup.POST("/new")
 
 			employeesGroup.GET("/:id")
-			employeesGroup.PUT("/:id")
+			employeesGroup.PATCH("/:id")
 			employeesGroup.DELETE("/:id")
 		}
 
+		// Не в приоритете
 		notificationsGroup := authenticated.Group("/notifications")
 		{
 			notificationsGroup.GET("")
