@@ -66,21 +66,7 @@ definitions:
         - $ref: '#/definitions/models.Verification'
         description: Статус верификации
     type: object
-  models.Session:
-    properties:
-      expires_at:
-        type: string
-      refresh_token:
-        type: string
-    type: object
-  models.Verification:
-    properties:
-      code:
-        type: string
-      verified:
-        type: boolean
-    type: object
-  university.News:
+  models.News:
     properties:
       body:
         description: Основной текст новостной записи.
@@ -116,6 +102,20 @@ definitions:
           $ref: '#/definitions/models.Editor'
         type: array
     type: object
+  models.Session:
+    properties:
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Verification:
+    properties:
+      code:
+        type: string
+      verified:
+        type: boolean
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -136,7 +136,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/university.News'
+              $ref: '#/definitions/models.News'
             type: array
         "400":
           description: Bad Request
@@ -154,8 +154,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/httpv1.errorResponse'
-      security:
-      - EditorsAuth: []
       summary: Editor Get All News
       tags:
       - editors
@@ -177,7 +175,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/university.News'
+            $ref: '#/definitions/models.News'
         "400":
           description: Bad Request
           schema:
@@ -194,8 +192,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/httpv1.errorResponse'
-      security:
-      - EditorsAuth: []
       summary: Editor Get News By ID
       tags:
       - editors
@@ -235,9 +231,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/httpv1.errorResponse'
-      security:
-      - EditorsAuth: []
-      summary: Editor Refresh Token
       tags:
       - editors
   /editors/sign-in:
@@ -318,8 +311,8 @@ paths:
       summary: Editor SignUp
       tags:
       - editors
-  /editors/verify/{code}:
-    post:
+  /editors/verify/{hash}:
+    get:
       consumes:
       - application/json
       description: editor verify registration
@@ -356,6 +349,78 @@ paths:
       summary: Editor Verify Registration
       tags:
       - editors
+  /visitors/news:
+    get:
+      consumes:
+      - application/json
+      description: visitor get all news
+      operationId: visitorGetAllNews
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.News'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      summary: Visitor Get All News
+      tags:
+      - visitors
+  /visitors/news/{id}:
+    get:
+      consumes:
+      - application/json
+      description: visitor get news by id
+      operationId: visitorsGetNewsById
+      parameters:
+      - description: news id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.News'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/httpv1.errorResponse'
+      summary: Visitor Get News By ID
+      tags:
+      - visitors
 securityDefinitions:
   AdminAuth:
     in: header

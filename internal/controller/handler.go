@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
+	"sas/docs"
 	_ "sas/docs"
 	"sas/internal/controller/httpv1"
 	"sas/internal/service"
@@ -31,13 +33,15 @@ func NewHandler(universitiesService service.Universities, editorsService service
 }
 
 // Init - Инициализация обработчика событий, добавление delevelopers роутов
-func (h *Handler) Init() *gin.Engine {
+func (h *Handler) Init(host string, port string) *gin.Engine {
 	router := gin.Default() // Инициализируем стандартный маршрутизатор
 	// Добавление нужных middleware
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
 	)
+
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", host, port)
 
 	// Для отображения документации api
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

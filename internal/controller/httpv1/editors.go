@@ -132,7 +132,7 @@ type refreshInput struct {
 }
 
 // @Summary Editor Refresh Token
-// @Security EditorsAuth
+
 // @Tags editors
 // @Description editor refresh tokens
 // @ID editorRefresh
@@ -182,7 +182,7 @@ func (h *Handler) editorRefresh(ctx *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /editors/verify/{code} [post]
+// @Router /editors/verify/{hash} [get]
 // editorVerify - Подтверждение создания учетной записи редактора
 func (h *Handler) editorVerify(ctx *gin.Context) {
 	hash := ctx.Param("hash")
@@ -202,12 +202,11 @@ func (h *Handler) editorVerify(ctx *gin.Context) {
 
 // @Summary Editor Get All News
 // @Tags editors
-// @Security EditorsAuth
 // @Description editor get all news
 // @ID editorGetAllNews
 // @Accept json
 // @Produce json
-// @Success 200 {array} university.News
+// @Success 200 {array} models.News
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -231,13 +230,12 @@ func (h *Handler) editorGetAllNews(ctx *gin.Context) {
 
 // @Summary Editor Get News By ID
 // @Tags editors
-// @Security EditorsAuth
 // @Description editor get news by id
 // @ID editorsGetNewsById
 // @Accept json
 // @Produce json
 // @Param id path string true "news id"
-// @Success 200 {object} university.News
+// @Success 200 {object} models.News
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
