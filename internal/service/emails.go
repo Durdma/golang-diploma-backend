@@ -21,3 +21,11 @@ func (s *EmailService) AddToList(input AddToListInput) error {
 		VerificationCode: input.VerificationCode,
 	})
 }
+
+func (s *EmailService) AddToListAdmin(input AddToListInput) error {
+	return s.provider.AddEmailToListAdmin(email.AddEmailInput{
+		Email:            input.Email,
+		Name:             input.Name,
+		VerificationCode: input.VerificationCode,
+	})
+}

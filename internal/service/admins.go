@@ -49,7 +49,7 @@ func (s *AdminsService) SignUp(ctx context.Context, input AdminSignUpInput) erro
 		return err
 	}
 
-	return s.emailService.AddToList(AddToListInput{
+	return s.emailService.AddToListAdmin(AddToListInput{
 		Email:            input.Email,
 		Name:             input.Name,
 		VerificationCode: verificationCode.Hex(),

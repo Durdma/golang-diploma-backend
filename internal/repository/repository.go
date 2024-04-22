@@ -13,6 +13,14 @@ type Universities interface {
 	GetByDomain(ctx context.Context, domain string) (models.University, error)
 }
 
+type Admins interface {
+	Create(ctx context.Context, adm models.Admin) error
+	GetByCredentials(ctx context.Context, email string, password string) (models.Admin, error)
+	GetByRefreshToken(ctx context.Context, refreshToken string) (models.Admin, error)
+	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
+	Verify(ctx context.Context, code string) error
+}
+
 // Editors - Интерфейс для репозитория редакторов
 type Editors interface {
 	Create(ctx context.Context, editor models.Editor) error
@@ -30,6 +38,7 @@ type News interface {
 
 // Repositories - структура со всеми репозиториями
 type Repositories struct {
+	Admins       Admins
 	Universities Universities
 	Editors      Editors
 	News         News
@@ -38,6 +47,7 @@ type Repositories struct {
 // NewRepositories - Создание общего репозитория
 func NewRepositories(db *mongo.Database) *Repositories {
 	return &Repositories{
+		Admins:       mdb.NewAdminsRepo(db),
 		Universities: mdb.NewUniversityRepo(db),
 		Editors:      mdb.NewEditorsRepo(db),
 		News:         mdb.NewNewsRepo(db),

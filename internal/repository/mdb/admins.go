@@ -28,9 +28,9 @@ func (r *AdminsRepo) Create(ctx context.Context, adm models.Admin) error {
 func (r *AdminsRepo) GetByCredentials(ctx context.Context, email string, password string) (models.Admin, error) {
 	var adm models.Admin
 	err := r.db.FindOne(ctx, bson.M{
-		"email":        email,
-		"password":     password,
-		"verification": true,
+		"email":                 email,
+		"password":              password,
+		"verification.verified": true,
 	}).Decode(&adm)
 
 	logger.Infof("%+v\n", adm.ID)

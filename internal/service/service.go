@@ -73,10 +73,12 @@ type AddToListInput struct {
 
 type Emails interface {
 	AddToList(input AddToListInput) error
+	AddToListAdmin(input AddToListInput) error
 }
 
 // Services - Объединение всех сервисов
 type Services struct {
+	Admins       Admins
 	Universities Universities
 	Editors      Editors
 }
@@ -87,6 +89,7 @@ func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.
 	refreshTTL time.Duration) *Services {
 	emailService := NewEmailsService(emailProvider, "")
 	return &Services{
+		Admins:       NewAdminsService(repos.Admins, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 		Universities: NewUniversitiesService(repos.Universities, cache),
 		Editors:      NewEditorsService(repos.Editors, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 	}
