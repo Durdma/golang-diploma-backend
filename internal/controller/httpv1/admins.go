@@ -3,7 +3,9 @@ package httpv1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sas/internal/renderer"
 	"sas/internal/service"
+	"sas/internal/view"
 	"sas/pkg/logger"
 )
 
@@ -11,7 +13,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 	admins := api.Group("/admins")
 	{
 		admins.POST("/sign-in", h.adminSignIn)
-		admins.GET("/sign-in")
+		admins.GET("/sign-in", h.getAdminSignIn)
 		admins.POST("/auth/refresh", h.adminRefresh)
 		admins.GET("/verify/:hash", h.adminVerify)
 	}
@@ -113,18 +115,22 @@ type adminsSignInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// TODO implement resolve domain
+func (h *Handler) getAdminSignIn(ctx *gin.Context) {
+	resp := renderer.New(ctx.Request.Context(), http.StatusOK, view.Login())
+	ctx.Render(http.StatusOK, resp)
+}
+
 func (h *Handler) adminSignIn(ctx *gin.Context) {
-	var input adminsSignInInput
-	if err := ctx.BindJSON(&input); err != nil {
-		newErrorResponse(ctx, http.StatusBadRequest, "invalid body input")
+	input := adminsSignInInput{
+		Email:    ctx.Request.FormValue("email"),
+		Password: ctx.Request.FormValue("password"),
+	}
+	if input.Email == "" || input.Password == "" {
+		// TODO implement return html template
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid input body")
 		return
 	}
-
-	//univ, err := getUniversityFromContext(ctx)
-	//if err != nil {
-	//	newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
 
 	res, err := h.adminsService.SignIn(ctx.Request.Context(), service.AdminSignInInput{
 		Email:    input.Email,

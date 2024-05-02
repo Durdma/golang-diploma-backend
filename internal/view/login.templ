@@ -1,0 +1,49 @@
+package view
+
+templ Login() {
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+
+    <div hx-ext="response-targets">
+        <h1>Test Sign In</h1>
+        <form
+            hx-post="/api/v1/admins/sign-in"
+            hx-trigger="submit"
+            hx-target-401="#login-error"
+            >
+
+            <div id="login-error"></div>
+
+            <div>
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="name@mail.com"
+                    required=""
+                    autocomplete="email"
+                    />
+            </div>
+
+            <div>
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="*******"
+                    required=""
+                    autocomplete="current-password"
+                />
+            </div>
+            <button type="submit">
+                Sign-in
+            </button>
+        </form>
+    </div>
+}
+
+templ LoginError() {
+    <p>Invalid credentials</p>
+}

@@ -9,6 +9,7 @@ import (
 	"sas/docs"
 	_ "sas/docs"
 	"sas/internal/controller/httpv1"
+	"sas/internal/renderer"
 	"sas/internal/service"
 	"sas/pkg/auth"
 )
@@ -40,6 +41,11 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 		gin.Recovery(),
 		gin.Logger(),
 	)
+
+	router.LoadHTMLGlob("..\\..\\internal\\view\\*")
+
+	ginHTMLRenderer := router.HTMLRender
+	router.HTMLRender = &renderer.HTMLTemplRenderer{FallbackHTMLRenderer: ginHTMLRenderer}
 
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", host, port)
 

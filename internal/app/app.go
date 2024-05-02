@@ -13,7 +13,6 @@ import (
 	"sas/pkg/auth"
 	"sas/pkg/cache"
 	"sas/pkg/database/mongodb"
-	"sas/pkg/dns_resolver"
 	"sas/pkg/email"
 	"sas/pkg/hash"
 	"sas/pkg/logger"
@@ -74,10 +73,6 @@ func Run(configPath string, envPath string) {
 
 	// Добавление контроллера
 	handlers := controller.NewHandler(services.Universities, services.Editors, services.Admins, tokenManager)
-
-	dnsResolver := dns_resolver.NewResolver(repos.DNS)
-
-	_ = dnsResolver
 
 	// Инициализация сервера и его запуск
 	srv := server.NewServer(cfg, handlers.Init(cfg.HTTP.Host, cfg.HTTP.Port))
