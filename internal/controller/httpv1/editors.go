@@ -121,10 +121,8 @@ func (h *Handler) editorSignIn(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, tokenResponse{
-		AccessToken:  res.AccessToken,
-		RefreshToken: res.RefreshToken,
-	})
+	ctx.SetCookie("access_token", res.AccessToken, res.AccessTokenTTL, "/", "localhost", false, true)
+	ctx.Status(http.StatusOK)
 }
 
 type refreshInput struct {

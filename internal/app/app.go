@@ -72,7 +72,7 @@ func Run(configPath string, envPath string) {
 		tokenManager, emailProvider, cfg.Auth.JWT.AccessTokenTTL, cfg.Auth.JWT.RefreshTokenTTL)
 
 	// Добавление контроллера
-	handlers := controller.NewHandler(services.Universities, services.Editors, services.Admins, tokenManager)
+	handlers := controller.NewHandler(services.Universities, services.Editors, services.Admins, tokenManager, services.Domains)
 
 	// Инициализация сервера и его запуск
 	srv := server.NewServer(cfg, handlers.Init(cfg.HTTP.Host, cfg.HTTP.Port))

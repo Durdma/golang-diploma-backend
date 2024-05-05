@@ -84,7 +84,7 @@ func (s *AdminsService) createSession(ctx context.Context, adminId primitive.Obj
 		err error
 	)
 
-	res.AccessToken, err = s.tokenManager.NewJWT(adminId.Hex(), s.accessTokenTTL)
+	res.AccessTokenTTL, res.AccessToken, err = s.tokenManager.NewJWT(adminId.Hex(), s.accessTokenTTL)
 	if err != nil {
 		return res, err
 	}

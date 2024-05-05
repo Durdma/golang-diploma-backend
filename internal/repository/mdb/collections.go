@@ -12,4 +12,5 @@ const (
 	newsCollection         = "news"
 	structsCollection      = "structs"
 	domainsCollection      = "domains"
+	sitesCollection        = "sites"
 )

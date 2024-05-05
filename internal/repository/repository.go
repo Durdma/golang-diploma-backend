@@ -8,10 +8,19 @@ import (
 	"sas/internal/repository/mdb"
 )
 
-type DNS interface {
-	Create(ctx context.Context, domain string) error
+type Domains interface {
+	Create(ctx context.Context, domain models.Domain) error
 	Delete(ctx context.Context, domain string) error
-	Get(ctx context.Context, domain string) (string, error)
+	Get(ctx context.Context, domain string) (models.Domain, error)
+	GetAllDomains(ctx context.Context) ([]models.Domain, error)
+}
+
+type Sites interface {
+	Create() error
+	GetSite() (models.University, error)
+	GetAllSites() ([]models.University, error)
+	ChangeSite() error
+	VerifySite() error
 }
 
 // Universities - Интерфейс для репозитория университетов
@@ -48,7 +57,7 @@ type Repositories struct {
 	Universities Universities
 	Editors      Editors
 	News         News
-	DNS          DNS
+	DNS          Domains
 }
 
 // NewRepositories - Создание общего репозитория

@@ -12,16 +12,18 @@ type Handler struct {
 	editorsService      service.Editors      // Сервис для работы с логикой редакторов
 	adminsService       service.Admins
 	tokenManager        auth.TokenManager
+	domainsService      service.Domains
 }
 
 // NewHandler - Создание обработчика событий. На вход передаем уже инициализированные сервисы
 func NewHandler(universitiesService service.Universities, editorsService service.Editors,
-	adminsService service.Admins, tokenManager auth.TokenManager) *Handler {
+	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
 		adminsService:       adminsService,
 		tokenManager:        tokenManager,
+		domainsService:      domainsService,
 	}
 }
 

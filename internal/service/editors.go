@@ -92,7 +92,7 @@ func (s *EditorsService) createSession(ctx context.Context, editorId primitive.O
 		err error
 	)
 
-	res.AccessToken, err = s.tokenManager.NewJWT(editorId.Hex(), s.accessTokenTTL)
+	res.AccessTokenTTL, res.AccessToken, err = s.tokenManager.NewJWT(editorId.Hex(), s.accessTokenTTL)
 	if err != nil {
 		return res, err
 	}

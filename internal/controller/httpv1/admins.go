@@ -10,27 +10,28 @@ import (
 )
 
 func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
-	admins := api.Group("/admins")
+	admins := api.Group("/admins", h.setDomainFromRequest)
 	{
 		admins.POST("/sign-in", h.adminSignIn)
 		admins.GET("/sign-in", h.getAdminSignIn)
 		admins.POST("/auth/refresh", h.adminRefresh)
 		admins.GET("/verify/:hash", h.adminVerify)
+		admins.GET("/logout", h.logOut)
 	}
 
 	//authenticated := admins.Group("/", h.userIdentity)
 	authenticated := admins.Group("/")
 	{
-		sitesGroup := authenticated.Group("/sites")
+		domains := authenticated.Group("/sites")
 		{
-			sitesGroup.GET("")
+			domains.GET("")
 
-			sitesGroup.GET("/new")
-			sitesGroup.POST("/new")
+			domains.GET("/new")
+			domains.POST("/new", h.postDomain)
 
-			sitesGroup.GET("/:id")
-			sitesGroup.PATCH("/:id")
-			sitesGroup.DELETE("/:id")
+			domains.GET("/:id")
+			domains.PATCH("/:id")
+			domains.DELETE("/:id")
 		}
 
 		adminsGroup := authenticated.Group("/admins")
@@ -96,6 +97,7 @@ func (h *Handler) adminsSignUp(ctx *gin.Context) {
 	//	return
 	//}
 
+	// TODO implement error if cant find user in db
 	if err := h.adminsService.SignUp(ctx.Request.Context(), service.AdminSignUpInput{
 		Name:     input.Name,
 		Email:    input.Email,
@@ -122,13 +124,21 @@ func (h *Handler) getAdminSignIn(ctx *gin.Context) {
 }
 
 func (h *Handler) adminSignIn(ctx *gin.Context) {
-	input := adminsSignInInput{
-		Email:    ctx.Request.FormValue("email"),
-		Password: ctx.Request.FormValue("password"),
+	domain, ex := ctx.Get("db_domain")
+	if !ex {
+		newErrorResponse(ctx, http.StatusBadRequest, "not exists")
+		return
 	}
-	if input.Email == "" || input.Password == "" {
-		// TODO implement return html template
-		newErrorResponse(ctx, http.StatusBadRequest, "invalid input body")
+
+	// TODO refactor for platform subdomain
+	if domain != "test1" {
+		newErrorResponse(ctx, http.StatusForbidden, "forbidden")
+		return
+	}
+
+	var input adminsSignInInput
+	if err := ctx.BindJSON(&input); err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid body input")
 		return
 	}
 
@@ -143,10 +153,8 @@ func (h *Handler) adminSignIn(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, tokenResponse{
-		AccessToken:  res.AccessToken,
-		RefreshToken: res.RefreshToken,
-	})
+	ctx.SetCookie("access_token", res.AccessToken, res.AccessTokenTTL, "/", "localhost", false, true)
+	ctx.Status(http.StatusOK)
 }
 
 func (h *Handler) adminRefresh(ctx *gin.Context) {
@@ -188,5 +196,10 @@ func (h *Handler) adminVerify(ctx *gin.Context) {
 		return
 	}
 
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) logOut(ctx *gin.Context) {
+	ctx.SetCookie("access_token", "", 0, "/", "localhost", false, true)
 	ctx.Status(http.StatusOK)
 }

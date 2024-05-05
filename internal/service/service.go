@@ -18,8 +18,9 @@ type Universities interface {
 }
 
 type Tokens struct {
-	AccessToken  string
-	RefreshToken string
+	AccessToken    string
+	RefreshToken   string
+	AccessTokenTTL int
 }
 
 type AdminSignUpInput struct {
@@ -40,6 +41,17 @@ type Admins interface {
 	SignUp(ctx context.Context, input AdminSignUpInput) error
 	RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error)
 	Verify(ctx context.Context, hash string) error
+}
+
+type DomainInput struct {
+	HTTPDomain string
+}
+
+type Domains interface {
+	AddDomain(ctx context.Context, input DomainInput) error
+	GetAllDomains(ctx context.Context) ([]models.Domain, error)
+	GetDomain(ctx context.Context, input string) (models.Domain, error)
+	DeleteDomain(ctx context.Context, input string) error
 }
 
 // EditorSignUpInput TODO Взято из примера для понимания, при добавлении редакторов переписать
@@ -81,6 +93,7 @@ type Services struct {
 	Admins       Admins
 	Universities Universities
 	Editors      Editors
+	Domains      Domains
 }
 
 // NewServices - Создание нового сервиса
@@ -92,5 +105,6 @@ func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.
 		Admins:       NewAdminsService(repos.Admins, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 		Universities: NewUniversitiesService(repos.Universities, cache),
 		Editors:      NewEditorsService(repos.Editors, hasher, tokenManager, emailService, accessTTL, refreshTTL),
+		Domains:      NewDomainsService(repos.DNS),
 	}
 }

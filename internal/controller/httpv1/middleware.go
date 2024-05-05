@@ -15,14 +15,32 @@ const (
 	universityCtx       = "university"
 )
 
-// TODO Domain resolve middleware
-//func (h *Handler) setDomainFromRequest() gin.HandlerFunc {
-//	return func(ctx *gin.Context) {
-//		domainName := strings.Split(ctx.Request.Host, ":")[0]
-//
-//		domain, err :=
-//	}
-//}
+func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
+	hostName := strings.Split(ctx.Request.Header.Get("Origin"), "://")
+	if len(hostName) != 2 {
+		logger.Error(errors.New("error length of Origin not equal to 2"))
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	domains := strings.Split(hostName[1], ".")
+	if len(domains) != 2 {
+		logger.Error(errors.New("error length of domains not equal to 2"))
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	subDomain := domains[0]
+
+	resp, err := h.domainsService.GetDomain(ctx, subDomain)
+	if err != nil {
+		logger.Error(err.Error())
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	ctx.Set("db_domain", resp.DBDomainName)
+}
 
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
 func (h *Handler) setUniversityFromRequest(ctx *gin.Context) {
