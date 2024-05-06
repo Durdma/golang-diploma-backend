@@ -24,17 +24,19 @@ type Handler struct {
 	adminsService       service.Admins
 	tokenManager        auth.TokenManager
 	domainsService      service.Domains
+	usersService        service.Users
 }
 
 // NewHandler - Создание новой сущности обработчика событий
 func NewHandler(universitiesService service.Universities, editorsService service.Editors,
-	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains) *Handler {
+	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains, usersService service.Users) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
 		adminsService:       adminsService,
 		tokenManager:        tokenManager,
 		domainsService:      domainsService,
+		usersService:        usersService,
 	}
 }
 
@@ -90,7 +92,7 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 
 // initAPI - Объединение в более общую группу роутеров
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService)
+	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService, h.usersService)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

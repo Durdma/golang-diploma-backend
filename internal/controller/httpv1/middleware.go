@@ -39,7 +39,7 @@ func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set("db_domain", resp.DBDomainName)
+	ctx.Set("db_domain", resp.ID)
 }
 
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету

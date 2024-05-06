@@ -125,10 +125,6 @@ func (h *Handler) editorSignIn(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-type refreshInput struct {
-	Token string `json:"token" binding:"required"`
-}
-
 // @Summary Editor Refresh Token
 
 // @Tags editors

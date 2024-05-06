@@ -18,9 +18,10 @@ type Universities interface {
 }
 
 type Tokens struct {
-	AccessToken    string
-	RefreshToken   string
-	AccessTokenTTL int
+	AccessToken     string
+	RefreshToken    string
+	AccessTokenTTL  int
+	RefreshTokenTTL int
 }
 
 type AdminSignUpInput struct {
@@ -34,6 +35,13 @@ type AdminSignInInput struct {
 	Email    string
 	Password string
 	Domain   string
+}
+
+type Users interface {
+	SignUp(ctx context.Context) error
+	SignIn(ctx context.Context, input SignInInput) (Tokens, error)
+	RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error)
+	Verify(ctx context.Context, domain primitive.ObjectID, hash string) error
 }
 
 type Admins interface {
@@ -94,6 +102,7 @@ type Services struct {
 	Universities Universities
 	Editors      Editors
 	Domains      Domains
+	Users        Users
 }
 
 // NewServices - Создание нового сервиса
@@ -106,5 +115,6 @@ func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.
 		Universities: NewUniversitiesService(repos.Universities, cache),
 		Editors:      NewEditorsService(repos.Editors, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 		Domains:      NewDomainsService(repos.DNS),
+		Users:        NewUsersService(repos.Users, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 	}
 }

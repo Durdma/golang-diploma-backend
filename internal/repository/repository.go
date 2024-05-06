@@ -28,6 +28,14 @@ type Universities interface {
 	GetByDomain(ctx context.Context, domain string) (models.University, error)
 }
 
+type Users interface {
+	Create(ctx context.Context, user models.User) error
+	GetByCredentials(ctx context.Context, email string, password string, domain primitive.ObjectID) (models.User, error)
+	GetByRefreshToken(ctx context.Context, domain primitive.ObjectID, refreshToken string) (models.User, error)
+	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
+	Verify(ctx context.Context, domain primitive.ObjectID, code string) error
+}
+
 type Admins interface {
 	Create(ctx context.Context, adm models.Admin) error
 	GetByCredentials(ctx context.Context, email string, password string) (models.Admin, error)
@@ -58,6 +66,7 @@ type Repositories struct {
 	Editors      Editors
 	News         News
 	DNS          Domains
+	Users        Users
 }
 
 // NewRepositories - Создание общего репозитория
@@ -68,5 +77,6 @@ func NewRepositories(db *mongo.Database) *Repositories {
 		Editors:      mdb.NewEditorsRepo(db),
 		News:         mdb.NewNewsRepo(db),
 		DNS:          mdb.NewDNSRepo(db),
+		Users:        mdb.NewUsersRepo(db),
 	}
 }
