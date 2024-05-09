@@ -2,8 +2,10 @@ package mdb
 
 // Названия коллекций в БД mongoDB
 const (
-	usersCollection        = "users"
-	editorsCollection      = "editors"
+	usersCollection   = "users"
+	domainsCollection = "domains"
+	sitesCollection   = "sites"
+
 	adminsCollection       = "admins"
 	universitiesCollection = "universities"
 	coursesCollection      = "courses"
@@ -11,6 +13,4 @@ const (
 	infoCollection         = "info"
 	newsCollection         = "news"
 	structsCollection      = "structs"
-	domainsCollection      = "domains"
-	sitesCollection        = "sites"
 )

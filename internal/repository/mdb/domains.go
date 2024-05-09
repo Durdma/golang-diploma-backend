@@ -3,6 +3,7 @@ package mdb
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"sas/internal/models"
 )
@@ -23,9 +24,9 @@ func (r *DomainsRepo) Create(ctx context.Context, domain models.Domain) error {
 	return err
 }
 
-func (r *DomainsRepo) Delete(ctx context.Context, domain string) error {
+func (r *DomainsRepo) Delete(ctx context.Context, domain primitive.ObjectID) error {
 	_, err := r.db.DeleteOne(ctx, bson.M{
-		"http_domain_name": domain,
+		"_id": domain,
 	})
 	if err != nil {
 		return err
@@ -34,7 +35,7 @@ func (r *DomainsRepo) Delete(ctx context.Context, domain string) error {
 	return err
 }
 
-func (r *DomainsRepo) Get(ctx context.Context, domain string) (models.Domain, error) {
+func (r *DomainsRepo) GetByHTTPName(ctx context.Context, domain string) (models.Domain, error) {
 	var resp models.Domain
 
 	err := r.db.FindOne(ctx, bson.M{
@@ -44,18 +45,20 @@ func (r *DomainsRepo) Get(ctx context.Context, domain string) (models.Domain, er
 		return models.Domain{}, err
 	}
 
-	//domainName := make(map[string]string)
-	//domainName["db_domain_name"] = ""
-	//opts := options.FindOne().SetProjection(bson.D{
-	//	{"domain_name", 0},
-	//	{"_id", 0},
-	//})
-	//
-	//err := r.db.FindOne(ctx, bson.M{
-	//	"domain_name": domain,
-	//}, opts).Decode(&domainName)
-
 	return resp, err
+}
+
+func (r *DomainsRepo) GetById(ctx context.Context, domainId primitive.ObjectID) (models.Domain, error) {
+	var resp models.Domain
+
+	err := r.db.FindOne(ctx, bson.M{
+		"_id": domainId,
+	}).Decode(&resp)
+	if err != nil {
+		return models.Domain{}, err
+	}
+
+	return resp, nil
 }
 
 func (r *DomainsRepo) GetAllDomains(ctx context.Context) ([]models.Domain, error) {

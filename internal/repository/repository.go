@@ -10,13 +10,14 @@ import (
 
 type Domains interface {
 	Create(ctx context.Context, domain models.Domain) error
-	Delete(ctx context.Context, domain string) error
-	Get(ctx context.Context, domain string) (models.Domain, error)
+	Delete(ctx context.Context, domain primitive.ObjectID) error
+	GetByHTTPName(ctx context.Context, domain string) (models.Domain, error)
+	GetById(ctx context.Context, domainId primitive.ObjectID) (models.Domain, error)
 	GetAllDomains(ctx context.Context) ([]models.Domain, error)
 }
 
 type Sites interface {
-	Create() error
+	Create(ctx context.Context, university models.University) (primitive.ObjectID, error)
 	GetSite() (models.University, error)
 	GetAllSites() ([]models.University, error)
 	ChangeSite() error
@@ -34,23 +35,19 @@ type Users interface {
 	GetByRefreshToken(ctx context.Context, domain primitive.ObjectID, refreshToken string) (models.User, error)
 	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
 	Verify(ctx context.Context, domain primitive.ObjectID, code string) error
+	GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error)
+	GetAllEditors(ctx context.Context) ([]models.User, error)
 }
 
 type Admins interface {
 	Create(ctx context.Context, adm models.Admin) error
-	GetByCredentials(ctx context.Context, email string, password string) (models.Admin, error)
-	GetByRefreshToken(ctx context.Context, refreshToken string) (models.Admin, error)
-	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
-	Verify(ctx context.Context, code string) error
 }
 
 // Editors - Интерфейс для репозитория редакторов
 type Editors interface {
 	Create(ctx context.Context, editor models.Editor) error
-	GetByCredentials(ctx context.Context, universityId primitive.ObjectID, email string, password string) (models.Editor, error)
-	GetByRefreshToken(ctx context.Context, universityId primitive.ObjectID, refreshToken string) (models.Editor, error)
-	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
-	Verify(ctx context.Context, code string) error
+	ChangeBlockStatus(ctx context.Context, editorId string, state bool) error
+	ChangeVerificationStatus(ctx context.Context, editorId string, state bool) error
 }
 
 type News interface {
@@ -67,6 +64,7 @@ type Repositories struct {
 	News         News
 	DNS          Domains
 	Users        Users
+	Sites        Sites
 }
 
 // NewRepositories - Создание общего репозитория
@@ -78,5 +76,6 @@ func NewRepositories(db *mongo.Database) *Repositories {
 		News:         mdb.NewNewsRepo(db),
 		DNS:          mdb.NewDNSRepo(db),
 		Users:        mdb.NewUsersRepo(db),
+		Sites:        mdb.NewSitesRepo(db),
 	}
 }

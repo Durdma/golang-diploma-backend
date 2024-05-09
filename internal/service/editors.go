@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"sas/internal/models"
 	"sas/internal/repository"
 	"sas/pkg/auth"
 	"sas/pkg/hash"
-	"sas/pkg/logger"
 	"time"
 )
 
@@ -61,54 +61,36 @@ func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) er
 	})
 }
 
-// SignIn - Вход редактора на сайт по паре логин-пароль
-func (s *EditorsService) SignIn(ctx context.Context, input EditorSignInInput) (Tokens, error) {
-	editor, err := s.repo.GetByCredentials(ctx, input.UniversityID, input.Email, s.hasher.Hash(input.Password))
-	logger.Info(editor)
-	if err != nil {
-		return Tokens{}, err
+func (s *EditorsService) ChangeEditorBlockStatus(ctx context.Context, editorId string, state string) error {
+	stateBool := false
+	if state == "true" {
+		stateBool = true
+	} else {
+		if state == "false" {
+			stateBool = false
+		} else {
+			return errors.New("incorrect state")
+		}
 	}
 
-	return s.createSession(ctx, editor.ID)
+	return s.repo.ChangeBlockStatus(ctx, editorId, stateBool)
 }
 
-func (s *EditorsService) RefreshTokens(ctx context.Context, universityId primitive.ObjectID, refreshToken string) (Tokens, error) {
-	editor, err := s.repo.GetByRefreshToken(ctx, universityId, refreshToken)
-	if err != nil {
-		return Tokens{}, err
+func (s *EditorsService) ChangeEditorVerifyStatus(ctx context.Context, editorId string, state string) error {
+	stateBool := false
+	if state == "true" {
+		stateBool = true
+	} else {
+		if state == "false" {
+			stateBool = false
+		} else {
+			return errors.New("incorrect state")
+		}
 	}
 
-	return s.createSession(ctx, editor.ID)
+	return s.repo.ChangeVerificationStatus(ctx, editorId, stateBool)
 }
 
-// Verify - Подтверждение регистрации нового редактора
-func (s *EditorsService) Verify(ctx context.Context, code string) error {
-	return s.repo.Verify(ctx, code)
-}
-
-func (s *EditorsService) createSession(ctx context.Context, editorId primitive.ObjectID) (Tokens, error) {
-	var (
-		res Tokens
-		err error
-	)
-
-	res.AccessTokenTTL, res.AccessToken, err = s.tokenManager.NewJWT(editorId.Hex(), s.accessTokenTTL)
-	if err != nil {
-		return res, err
-	}
-
-	res.RefreshToken, err = s.tokenManager.NewRefreshToken()
-	if err != nil {
-		return res, err
-	}
-
-	session := models.Session{
-		RefreshToken: res.RefreshToken,
-		ExpiresAt:    time.Now().Add(s.refreshTokenTTL),
-	}
-	err = s.repo.SetSession(ctx, editorId, session)
-
-	logger.Info("session added")
-
-	return res, err
+func (s *EditorsService) ChangeEditor(ctx context.Context) error {
+	return nil
 }

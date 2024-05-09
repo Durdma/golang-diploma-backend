@@ -14,12 +14,13 @@ type Handler struct {
 	tokenManager        auth.TokenManager
 	domainsService      service.Domains
 	usersService        service.Users
+	sitesService        service.Sites
 }
 
 // NewHandler - Создание обработчика событий. На вход передаем уже инициализированные сервисы
 func NewHandler(universitiesService service.Universities, editorsService service.Editors,
 	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains,
-	usersService service.Users) *Handler {
+	usersService service.Users, sitesService service.Sites) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
@@ -27,6 +28,7 @@ func NewHandler(universitiesService service.Universities, editorsService service
 		tokenManager:        tokenManager,
 		domainsService:      domainsService,
 		usersService:        usersService,
+		sitesService:        sitesService,
 	}
 }
 

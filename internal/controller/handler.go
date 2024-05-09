@@ -11,7 +11,6 @@ import (
 	"sas/docs"
 	_ "sas/docs"
 	"sas/internal/controller/httpv1"
-	"sas/internal/renderer"
 	"sas/internal/service"
 	"sas/pkg/auth"
 	"sas/pkg/logger"
@@ -25,11 +24,13 @@ type Handler struct {
 	tokenManager        auth.TokenManager
 	domainsService      service.Domains
 	usersService        service.Users
+	sitesService        service.Sites
 }
 
 // NewHandler - Создание новой сущности обработчика событий
 func NewHandler(universitiesService service.Universities, editorsService service.Editors,
-	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains, usersService service.Users) *Handler {
+	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains,
+	usersService service.Users, sitesService service.Sites) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
@@ -37,6 +38,7 @@ func NewHandler(universitiesService service.Universities, editorsService service
 		tokenManager:        tokenManager,
 		domainsService:      domainsService,
 		usersService:        usersService,
+		sitesService:        sitesService,
 	}
 }
 
@@ -48,6 +50,7 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 		gin.Recovery(),
 		gin.Logger(),
 		cors.New(cors.Config{
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 			AllowCredentials: true,
 			AllowHeaders:     []string{"content-type"},
 			AllowOriginFunc: func(origin string) bool {
@@ -69,11 +72,6 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 		}),
 	)
 
-	router.LoadHTMLGlob("..\\..\\internal\\view\\*")
-
-	ginHTMLRenderer := router.HTMLRender
-	router.HTMLRender = &renderer.HTMLTemplRenderer{FallbackHTMLRenderer: ginHTMLRenderer}
-
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", host, port)
 
 	// Для отображения документации api
@@ -92,7 +90,7 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 
 // initAPI - Объединение в более общую группу роутеров
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService, h.usersService)
+	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService, h.usersService, h.sitesService)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

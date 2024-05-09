@@ -42,13 +42,18 @@ type SignInInput struct {
 	Domain   primitive.ObjectID
 }
 
-func (s *UsersService) SignIn(ctx context.Context, input SignInInput) (Tokens, error) {
+func (s *UsersService) SignIn(ctx context.Context, input SignInInput) (models.User, Tokens, error) {
 	user, err := s.repo.GetByCredentials(ctx, input.Email, s.hasher.Hash(input.Password), input.Domain)
 	if err != nil {
-		return Tokens{}, err
+		return models.User{}, Tokens{}, err
 	}
 
-	return s.createSession(ctx, user.ID)
+	session, err := s.createSession(ctx, user.ID)
+	if err != nil {
+		return models.User{}, Tokens{}, err
+	}
+
+	return user, session, err
 }
 
 func (s *UsersService) RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error) {
@@ -90,4 +95,17 @@ func (s *UsersService) createSession(ctx context.Context, userId primitive.Objec
 	res.RefreshTokenTTL = int(s.refreshTokenTTL.Seconds())
 
 	return res, err
+}
+
+func (s *UsersService) GetUserById(ctx context.Context, userId string) (models.User, error) {
+	id, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return s.repo.GetUserById(ctx, id)
+}
+
+func (s *UsersService) GetAllEditors(ctx context.Context) ([]models.User, error) {
+	return s.repo.GetAllEditors(ctx)
 }

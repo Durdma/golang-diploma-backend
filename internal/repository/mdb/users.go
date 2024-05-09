@@ -30,7 +30,8 @@ func (r *UsersRepo) GetByCredentials(ctx context.Context, email string, password
 		"email":                 email,
 		"password":              password,
 		"verification.verified": true,
-		"domain":                domain,
+		"is_blocked":            false,
+		"domain_id":             domain,
 	}).Decode(&user)
 
 	return user, err
@@ -70,4 +71,32 @@ func (r *UsersRepo) Verify(ctx context.Context, domain primitive.ObjectID, code 
 		bson.M{"$set": bson.M{"verification.verified": true}})
 
 	return err
+}
+
+func (r *UsersRepo) GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error) {
+	var user models.User
+	err := r.db.FindOne(ctx, bson.M{
+		"_id": userId,
+	}).Decode(&user)
+
+	return user, err
+}
+
+func (r *UsersRepo) GetAllEditors(ctx context.Context) ([]models.User, error) {
+	var editors []models.User
+
+	filter := bson.M{
+		"is_admin": false,
+	}
+
+	cursor, err := r.db.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = cursor.All(ctx, &editors); err != nil {
+		return nil, err
+	}
+
+	return editors, err
 }

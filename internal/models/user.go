@@ -10,8 +10,10 @@ type User struct {
 	Name         string             `json:"name" bson:"name"`
 	Email        string             `json:"email" bson:"email"`
 	Password     string             `json:"password" bson:"password"`
-	Domain       primitive.ObjectID `json:"domain" bson:"domain"`
+	DomainId     primitive.ObjectID `json:"domain_id" bson:"domain_id"`
+	DomainName   string             `json:"domain_name"`
 	IsAdmin      bool               `json:"is_admin" bson:"is_admin"`
+	IsBlocked    bool               `json:"is_blocked" bson:"is_blocked"`
 	RegisteredAt time.Time          `json:"registered_at" bson:"registered_at"`
 	LastVisitAt  time.Time          `json:"last_visit_at" bson:"last_visit_at"`
 	Verification Verification       `json:"verification" bson:"verification"`

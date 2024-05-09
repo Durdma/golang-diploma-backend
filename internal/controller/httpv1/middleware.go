@@ -32,7 +32,7 @@ func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
 
 	subDomain := domains[0]
 
-	resp, err := h.domainsService.GetDomain(ctx, subDomain)
+	resp, err := h.domainsService.GetByHTTPName(ctx, subDomain)
 	if err != nil {
 		logger.Error(err.Error())
 		ctx.AbortWithStatus(http.StatusBadRequest)
@@ -40,6 +40,31 @@ func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
 	}
 
 	ctx.Set("db_domain", resp.ID)
+	ctx.Set("dom", resp.HTTPDomainName)
+}
+
+func (h *Handler) setUserFromRequest(ctx *gin.Context) {
+	accessToken, err := ctx.Cookie("access_token")
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.tokenManager.Parse(accessToken)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusForbidden, "no such user")
+		return
+	}
+
+	user, err := h.usersService.GetUserById(ctx, userId)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusForbidden, "no such user")
+		return
+	}
+
+	ctx.Set("user_id", user.ID)
+	ctx.Set("is_admin", user.IsAdmin)
+	ctx.Set("verified", user.Verification.Verified)
 }
 
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету

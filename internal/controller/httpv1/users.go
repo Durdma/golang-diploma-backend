@@ -23,6 +23,12 @@ type userSignInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type userSignInResponse struct {
+	Name    string `json:"name"`
+	Domain  string `json:"domain"`
+	IsAdmin bool   `json:"is_admin"`
+}
+
 func (h *Handler) signIn(ctx *gin.Context) {
 	domain, ex := ctx.Get("db_domain")
 	if !ex {
@@ -36,7 +42,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	res, err := h.usersService.SignIn(ctx, service.SignInInput{
+	user, tokens, err := h.usersService.SignIn(ctx, service.SignInInput{
 		Email:    input.Email,
 		Password: input.Password,
 		Domain:   domain.(primitive.ObjectID),
@@ -46,9 +52,14 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("access_token", res.AccessToken, res.AccessTokenTTL, "/", "localhost", false, true)
-	ctx.SetCookie("refresh_token", res.RefreshToken, res.RefreshTokenTTL, "/", "localhost", false, true)
-	ctx.Status(http.StatusOK)
+	ctx.SetSameSite(http.SameSiteNoneMode)
+	ctx.SetCookie("access_token", tokens.AccessToken, tokens.AccessTokenTTL, "/", "http://test1.localhost:3000", true, true)
+	ctx.SetCookie("refresh_token", tokens.RefreshToken, tokens.RefreshTokenTTL, "/", "http://test1.localhost:3000", true, true)
+	ctx.JSON(http.StatusOK, userSignInResponse{
+		Name:    user.Name,
+		Domain:  user.DomainName,
+		IsAdmin: user.IsAdmin,
+	})
 }
 
 func (h *Handler) getSignIn(ctx *gin.Context) {
