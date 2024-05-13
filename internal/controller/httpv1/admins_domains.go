@@ -13,6 +13,11 @@ type POSTDomainInput struct {
 
 // TODO refactor to POST site
 func (h *Handler) postDomain(ctx *gin.Context) {
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
+		return
+	}
+
 	var input POSTDomainInput
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "invalid body input")
@@ -42,31 +47,8 @@ type POSTSiteInput struct {
 }
 
 func (h *Handler) postNewSite(ctx *gin.Context) {
-	dom, ex := ctx.Get("dom")
-	if !ex {
-		newErrorResponse(ctx, http.StatusBadRequest, "no dom")
-		return
-	}
-
-	if dom.(string) != "test1" {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
-		return
-	}
-
-	isAdmin, ex := ctx.Get("is_admin")
-	if !ex {
-		newErrorResponse(ctx, http.StatusForbidden, "no is_admin")
-		return
-	}
-
-	verified, ex := ctx.Get("verified")
-	if !ex {
-		newErrorResponse(ctx, http.StatusForbidden, "no is_admin")
-		return
-	}
-
-	if !isAdmin.(bool) || !verified.(bool) {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
 		return
 	}
 

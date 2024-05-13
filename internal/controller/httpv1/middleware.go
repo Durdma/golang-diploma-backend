@@ -123,6 +123,37 @@ func (h *Handler) userIdentity(ctx *gin.Context) {
 	ctx.Set(userCtx, userId)
 }
 
+func getAdminsPermissions(ctx *gin.Context) (int, error) {
+	domain, ex := ctx.Get("dom")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no dom ctx")
+	}
+
+	if domain.(string) != "test1" {
+		return http.StatusForbidden, errors.New("incorrect domain")
+	}
+
+	isAdmin, ex := ctx.Get("is_admin")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no is_admin ctx")
+	}
+
+	if !isAdmin.(bool) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	verified, ex := ctx.Get("verified")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("access forbidden")
+	}
+
+	if !verified.(bool) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	return 0, nil
+}
+
 func getUserId(ctx *gin.Context) (string, error) {
 	id, ok := ctx.Get(userCtx)
 	if !ok {

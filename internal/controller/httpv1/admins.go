@@ -79,6 +79,11 @@ type adminsSignUpInput struct {
 }
 
 func (h *Handler) adminsSignUp(ctx *gin.Context) {
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
+		return
+	}
+
 	var input adminsSignUpInput
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "invalid input body")

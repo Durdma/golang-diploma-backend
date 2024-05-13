@@ -8,32 +8,8 @@ import (
 )
 
 func (h *Handler) getAllEditors(ctx *gin.Context) {
-	// TODO refactor verification to function
-	dom, ex := ctx.Get("dom")
-	if !ex {
-		newErrorResponse(ctx, http.StatusBadRequest, "no dom")
-		return
-	}
-
-	if dom.(string) != "test1" {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
-		return
-	}
-
-	isAdmin, ex := ctx.Get("is_admin")
-	if !ex {
-		newErrorResponse(ctx, http.StatusForbidden, "no is_admin")
-		return
-	}
-
-	verified, ex := ctx.Get("verified")
-	if !ex {
-		newErrorResponse(ctx, http.StatusForbidden, "no is_admin")
-		return
-	}
-
-	if !isAdmin.(bool) || !verified.(bool) {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
 		return
 	}
 
@@ -68,31 +44,8 @@ type patchEditorInput struct {
 }
 
 func (h *Handler) patchEditor(ctx *gin.Context) {
-	dom, ex := ctx.Get("dom")
-	if !ex {
-		newErrorResponse(ctx, http.StatusBadRequest, "no dom")
-		return
-	}
-
-	if dom.(string) != "test1" {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
-		return
-	}
-
-	isAdmin, ex := ctx.Get("is_admin")
-	if !ex {
-		newErrorResponse(ctx, http.StatusBadRequest, "no is_admin")
-		return
-	}
-
-	verified, ex := ctx.Get("verified")
-	if !ex {
-		newErrorResponse(ctx, http.StatusBadRequest, "no is_admin")
-		return
-	}
-
-	if !isAdmin.(bool) || !verified.(bool) {
-		newErrorResponse(ctx, http.StatusForbidden, "no permissions")
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
 		return
 	}
 
@@ -150,5 +103,8 @@ func (h *Handler) patchEditor(ctx *gin.Context) {
 
 // TODO
 func (h *Handler) postNewEditor(ctx *gin.Context) {
-	ctx.Status(http.StatusOK)
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
+		return
+	}
 }
