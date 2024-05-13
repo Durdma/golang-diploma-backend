@@ -50,6 +50,15 @@ func (r *UsersRepo) GetByRefreshToken(ctx context.Context, domain primitive.Obje
 	return user, err
 }
 
+func (r *UsersRepo) GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error) {
+	var user models.User
+	err := r.db.FindOne(ctx, bson.M{
+		"_id": userId,
+	}).Decode(&user)
+
+	return user, err
+}
+
 func (r *UsersRepo) SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error {
 	_, err := r.db.UpdateOne(ctx, bson.M{
 		"_id": userId}, bson.M{"$set": bson.M{"session": session}})
@@ -71,32 +80,4 @@ func (r *UsersRepo) Verify(ctx context.Context, domain primitive.ObjectID, code 
 		bson.M{"$set": bson.M{"verification.verified": true}})
 
 	return err
-}
-
-func (r *UsersRepo) GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error) {
-	var user models.User
-	err := r.db.FindOne(ctx, bson.M{
-		"_id": userId,
-	}).Decode(&user)
-
-	return user, err
-}
-
-func (r *UsersRepo) GetAllEditors(ctx context.Context) ([]models.User, error) {
-	var editors []models.User
-
-	filter := bson.M{
-		"is_admin": false,
-	}
-
-	cursor, err := r.db.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = cursor.All(ctx, &editors); err != nil {
-		return nil, err
-	}
-
-	return editors, err
 }

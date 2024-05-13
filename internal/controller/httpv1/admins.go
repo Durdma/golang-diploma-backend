@@ -18,7 +18,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 	{
 		domains := authenticated.Group("/sites")
 		{
-			domains.GET("", h.getAllSites)
+			domains.GET("", h.getAllDomains)
 
 			domains.GET("/new", h.getNewSite)
 			domains.POST("/new", h.postDomain) //TODO refactor to POST site
@@ -52,7 +52,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			employeesGroup.GET("", h.getAllEditors)
 
 			employeesGroup.GET("/new")
-			employeesGroup.POST("/new")
+			employeesGroup.POST("", h.postNewEditor)
 
 			employeesGroup.GET("/:id")
 			employeesGroup.PATCH("/:id", h.patchEditor)

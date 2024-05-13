@@ -91,6 +91,45 @@ func (s *EditorsService) ChangeEditorVerifyStatus(ctx context.Context, editorId 
 	return s.repo.ChangeVerificationStatus(ctx, editorId, stateBool)
 }
 
-func (s *EditorsService) ChangeEditor(ctx context.Context) error {
-	return nil
+func (s *EditorsService) GetAllEditors(ctx context.Context) ([]models.User, error) {
+	return s.repo.GetAllEditors(ctx)
+}
+
+type UpdateEditorInput struct {
+	Id         string
+	Name       string
+	Email      string
+	Password   string
+	DomainName string
+	DomainId   string
+	Verify     bool
+	Block      bool
+}
+
+func (s *EditorsService) UpdateEditor(ctx context.Context, newUser UpdateEditorInput) error {
+	userId, err := primitive.ObjectIDFromHex(newUser.Id)
+	if err != nil {
+		return err
+	}
+
+	domainId, err := primitive.ObjectIDFromHex(newUser.DomainId)
+	if err != nil {
+		return err
+	}
+
+	oldUser, err := s.repo.GetEditorById(ctx, userId)
+	if err != nil {
+		return err
+	}
+
+	oldUser.Name = newUser.Name
+	oldUser.Email = newUser.Email
+	oldUser.Password = s.hasher.Hash(newUser.Password)
+	oldUser.DomainId = domainId
+	oldUser.Verification.Verified = newUser.Verify
+	oldUser.IsBlocked = newUser.Block
+
+	err = s.repo.UpdateEditor(ctx, oldUser)
+
+	return err
 }

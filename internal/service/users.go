@@ -56,6 +56,15 @@ func (s *UsersService) SignIn(ctx context.Context, input SignInInput) (models.Us
 	return user, session, err
 }
 
+func (s *UsersService) GetUserById(ctx context.Context, userId string) (models.User, error) {
+	id, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return s.repo.GetUserById(ctx, id)
+}
+
 func (s *UsersService) RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error) {
 	user, err := s.repo.GetByRefreshToken(ctx, domain, refreshToken)
 	if err != nil {
@@ -95,17 +104,4 @@ func (s *UsersService) createSession(ctx context.Context, userId primitive.Objec
 	res.RefreshTokenTTL = int(s.refreshTokenTTL.Seconds())
 
 	return res, err
-}
-
-func (s *UsersService) GetUserById(ctx context.Context, userId string) (models.User, error) {
-	id, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return models.User{}, err
-	}
-
-	return s.repo.GetUserById(ctx, id)
-}
-
-func (s *UsersService) GetAllEditors(ctx context.Context) ([]models.User, error) {
-	return s.repo.GetAllEditors(ctx)
 }

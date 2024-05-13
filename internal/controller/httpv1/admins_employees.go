@@ -4,15 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sas/internal/service"
 )
 
-// TODO add to models.Editor field univ name
 func (h *Handler) getAllEditors(ctx *gin.Context) {
-	//domain, ex := ctx.GetByHTTPName("db_domain")
-	//if !ex {
-	//	newErrorResponse(ctx, http.StatusBadRequest, "no db_domain")
-	//	return
-	//
 	// TODO refactor verification to function
 	dom, ex := ctx.Get("dom")
 	if !ex {
@@ -42,7 +37,7 @@ func (h *Handler) getAllEditors(ctx *gin.Context) {
 		return
 	}
 
-	editors, err := h.usersService.GetAllEditors(ctx)
+	editors, err := h.editorsService.GetAllEditors(ctx)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -59,6 +54,17 @@ func (h *Handler) getAllEditors(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, editors)
+}
+
+type patchEditorInput struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	DomainName string `json:"domain_name"`
+	DomainId   string `json:"domain_id"`
+	Verify     bool   `json:"verify"`
+	Block      bool   `json:"block"`
 }
 
 func (h *Handler) patchEditor(ctx *gin.Context) {
@@ -99,25 +105,50 @@ func (h *Handler) patchEditor(ctx *gin.Context) {
 	case verifyEx && blockEx:
 		newErrorResponse(ctx, http.StatusBadRequest, "error query params")
 		return
-	case blockEx:
+	case blockEx && !verifyEx:
 		err := h.editorsService.ChangeEditorBlockStatus(ctx, userId, block)
 		if err != nil {
 			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
-	case verifyEx:
+	case verifyEx && !blockEx:
 		err := h.editorsService.ChangeEditorVerifyStatus(ctx, userId, verify)
 		if err != nil {
 			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
-	default:
+	case !verifyEx && !blockEx:
+		var userInput patchEditorInput
+		if err := ctx.BindJSON(&userInput); err != nil {
+			newErrorResponse(ctx, http.StatusBadRequest, err.Error())
+			return
+		}
 
+		fmt.Println(ctx.Request.Body)
+
+		err := h.editorsService.UpdateEditor(ctx, service.UpdateEditorInput{
+			Id:         userInput.Id,
+			Name:       userInput.Name,
+			Email:      userInput.Email,
+			Password:   userInput.Password,
+			DomainName: userInput.DomainName,
+			DomainId:   userInput.DomainId,
+			Verify:     userInput.Verify,
+			Block:      userInput.Block,
+		})
+		if err != nil {
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+	default:
+		newErrorResponse(ctx, http.StatusBadRequest, "something wrong")
+		return
 	}
 
 	ctx.Status(http.StatusOK)
 }
 
+// TODO
 func (h *Handler) postNewEditor(ctx *gin.Context) {
-
+	ctx.Status(http.StatusOK)
 }

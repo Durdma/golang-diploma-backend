@@ -13,6 +13,7 @@ type Domains interface {
 	Delete(ctx context.Context, domain primitive.ObjectID) error
 	GetByHTTPName(ctx context.Context, domain string) (models.Domain, error)
 	GetById(ctx context.Context, domainId primitive.ObjectID) (models.Domain, error)
+	GetByDomainName(ctx context.Context, domainName string) (models.Domain, error)
 	GetAllDomains(ctx context.Context) ([]models.Domain, error)
 }
 
@@ -33,10 +34,9 @@ type Users interface {
 	Create(ctx context.Context, user models.User) error
 	GetByCredentials(ctx context.Context, email string, password string, domain primitive.ObjectID) (models.User, error)
 	GetByRefreshToken(ctx context.Context, domain primitive.ObjectID, refreshToken string) (models.User, error)
+	GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error)
 	SetSession(ctx context.Context, userId primitive.ObjectID, session models.Session) error
 	Verify(ctx context.Context, domain primitive.ObjectID, code string) error
-	GetUserById(ctx context.Context, userId primitive.ObjectID) (models.User, error)
-	GetAllEditors(ctx context.Context) ([]models.User, error)
 }
 
 type Admins interface {
@@ -48,6 +48,9 @@ type Editors interface {
 	Create(ctx context.Context, editor models.Editor) error
 	ChangeBlockStatus(ctx context.Context, editorId string, state bool) error
 	ChangeVerificationStatus(ctx context.Context, editorId string, state bool) error
+	GetEditorById(ctx context.Context, userId primitive.ObjectID) (models.User, error)
+	UpdateEditor(ctx context.Context, user models.User) error
+	GetAllEditors(ctx context.Context) ([]models.User, error)
 }
 
 type News interface {

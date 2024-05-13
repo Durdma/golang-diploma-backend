@@ -61,6 +61,18 @@ func (r *DomainsRepo) GetById(ctx context.Context, domainId primitive.ObjectID) 
 	return resp, nil
 }
 
+func (r *DomainsRepo) GetByDomainName(ctx context.Context, domainName string) (models.Domain, error) {
+	var domain models.Domain
+	err := r.db.FindOne(ctx, bson.M{
+		"domain_name": domainName,
+	}).Decode(&domain)
+	if err != nil {
+		return models.Domain{}, err
+	}
+
+	return domain, err
+}
+
 func (r *DomainsRepo) GetAllDomains(ctx context.Context) ([]models.Domain, error) {
 	var domains []models.Domain
 

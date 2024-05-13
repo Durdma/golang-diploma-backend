@@ -60,3 +60,47 @@ func (r *EditorsRepo) ChangeVerificationStatus(ctx context.Context, editorId str
 
 	return err
 }
+
+func (r *EditorsRepo) GetEditorById(ctx context.Context, userId primitive.ObjectID) (models.User, error) {
+	var user models.User
+	err := r.db.FindOne(ctx, bson.M{
+		"_id":      userId,
+		"is_admin": false,
+	}).Decode(&user)
+
+	return user, err
+}
+
+func (r *EditorsRepo) UpdateEditor(ctx context.Context, user models.User) error {
+	_, err := r.db.UpdateOne(ctx, bson.M{
+		"_id": user.ID,
+	}, bson.M{"$set": bson.M{
+		"name":                  user.Name,
+		"email":                 user.Email,
+		"password":              user.Password,
+		"domain_id":             user.DomainId,
+		"is_blocked":            user.IsBlocked,
+		"verification.verified": user.Verification.Verified,
+	}})
+
+	return err
+}
+
+func (r *EditorsRepo) GetAllEditors(ctx context.Context) ([]models.User, error) {
+	var editors []models.User
+
+	filter := bson.M{
+		"is_admin": false,
+	}
+
+	cursor, err := r.db.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = cursor.All(ctx, &editors); err != nil {
+		return nil, err
+	}
+
+	return editors, err
+}

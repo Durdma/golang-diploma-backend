@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "editors"
                 ],
-                "summary": "Editor Get All News",
+                "summary": "Editor GetByHTTPName All News",
                 "operationId": "editorGetAllNews",
                 "responses": {
                     "200": {
@@ -78,7 +78,7 @@ const docTemplate = `{
                 "tags": [
                     "editors"
                 ],
-                "summary": "Editor Get News By ID",
+                "summary": "Editor GetByHTTPName News By ID",
                 "operationId": "editorsGetNewsById",
                 "parameters": [
                     {
@@ -368,7 +368,7 @@ const docTemplate = `{
                 "tags": [
                     "visitors"
                 ],
-                "summary": "Visitor Get All News",
+                "summary": "Visitor GetByHTTPName All News",
                 "operationId": "visitorGetAllNews",
                 "responses": {
                     "200": {
@@ -419,7 +419,7 @@ const docTemplate = `{
                 "tags": [
                     "visitors"
                 ],
-                "summary": "Visitor Get News By ID",
+                "summary": "Visitor GetByHTTPName News By ID",
                 "operationId": "visitorsGetNewsById",
                 "parameters": [
                     {

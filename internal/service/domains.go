@@ -43,6 +43,10 @@ func (s *DomainsService) GetById(ctx context.Context, domainId primitive.ObjectI
 	return s.repo.GetById(ctx, domainId)
 }
 
+func (s *DomainsService) GetByDomainName(ctx context.Context, domainName string) (models.Domain, error) {
+	return s.repo.GetByDomainName(ctx, domainName)
+}
+
 func (s *DomainsService) GetAllDomains(ctx context.Context) ([]models.Domain, error) {
 	return s.repo.GetAllDomains(ctx)
 }

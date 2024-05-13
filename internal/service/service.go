@@ -43,7 +43,6 @@ type Users interface {
 	RefreshTokens(ctx context.Context, domain primitive.ObjectID, refreshToken string) (Tokens, error)
 	Verify(ctx context.Context, domain primitive.ObjectID, hash string) error
 	GetUserById(ctx context.Context, userId string) (models.User, error)
-	GetAllEditors(ctx context.Context) ([]models.User, error)
 }
 
 type SiteInput struct {
@@ -73,6 +72,7 @@ type Domains interface {
 	DeleteDomain(ctx context.Context, domainId primitive.ObjectID) error
 	GetByHTTPName(ctx context.Context, domain string) (models.Domain, error)
 	GetById(ctx context.Context, domainId primitive.ObjectID) (models.Domain, error)
+	GetByDomainName(ctx context.Context, domainName string) (models.Domain, error)
 	GetAllDomains(ctx context.Context) ([]models.Domain, error)
 }
 
@@ -90,7 +90,8 @@ type Editors interface {
 	SignUp(ctx context.Context, input EditorSignUpInput) error
 	ChangeEditorBlockStatus(ctx context.Context, editorId string, state string) error
 	ChangeEditorVerifyStatus(ctx context.Context, editorId string, state string) error
-	ChangeEditor(ctx context.Context) error
+	GetAllEditors(ctx context.Context) ([]models.User, error)
+	UpdateEditor(ctx context.Context, newUser UpdateEditorInput) error
 }
 
 type AddToListInput struct {
