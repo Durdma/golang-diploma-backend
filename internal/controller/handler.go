@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"context"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -11,21 +13,32 @@ import (
 	"sas/internal/controller/httpv1"
 	"sas/internal/service"
 	"sas/pkg/auth"
+	"sas/pkg/logger"
 )
 
 // Handler - Структура обработчика событий, главного
 type Handler struct {
 	universitiesService service.Universities
 	editorsService      service.Editors
+	adminsService       service.Admins
 	tokenManager        auth.TokenManager
+	domainsService      service.Domains
+	usersService        service.Users
+	sitesService        service.Sites
 }
 
 // NewHandler - Создание новой сущности обработчика событий
-func NewHandler(universitiesService service.Universities, editorsService service.Editors, tokenManager auth.TokenManager) *Handler {
+func NewHandler(universitiesService service.Universities, editorsService service.Editors,
+	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains,
+	usersService service.Users, sitesService service.Sites) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
+		adminsService:       adminsService,
 		tokenManager:        tokenManager,
+		domainsService:      domainsService,
+		usersService:        usersService,
+		sitesService:        sitesService,
 	}
 }
 
@@ -36,6 +49,27 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
+		cors.New(cors.Config{
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+			AllowCredentials: true,
+			AllowHeaders:     []string{"content-type"},
+			AllowOriginFunc: func(origin string) bool {
+				origins, err := h.domainsService.GetAllDomains(context.Background())
+				fmt.Println(origins)
+				if err != nil {
+					logger.Error("error while fetching allow origins from DB")
+					return false
+				}
+
+				for _, orig := range origins {
+					if "http://"+orig.HTTPDomainName+".localhost:3000" == origin {
+						return true
+					}
+				}
+
+				return false
+			},
+		}),
 	)
 
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", host, port)
@@ -56,7 +90,7 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 
 // initAPI - Объединение в более общую группу роутеров
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.tokenManager)
+	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService, h.usersService, h.sitesService)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

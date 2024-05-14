@@ -17,11 +17,6 @@ const docTemplate = `{
     "paths": {
         "/editors/news": {
             "get": {
-                "security": [
-                    {
-                        "EditorsAuth": []
-                    }
-                ],
                 "description": "editor get all news",
                 "consumes": [
                     "application/json"
@@ -32,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "editors"
                 ],
-                "summary": "Editor Get All News",
+                "summary": "Editor GetByHTTPName All News",
                 "operationId": "editorGetAllNews",
                 "responses": {
                     "200": {
@@ -73,11 +68,6 @@ const docTemplate = `{
         },
         "/editors/news/{id}": {
             "get": {
-                "security": [
-                    {
-                        "EditorsAuth": []
-                    }
-                ],
                 "description": "editor get news by id",
                 "consumes": [
                     "application/json"
@@ -88,7 +78,7 @@ const docTemplate = `{
                 "tags": [
                     "editors"
                 ],
-                "summary": "Editor Get News By ID",
+                "summary": "Editor GetByHTTPName News By ID",
                 "operationId": "editorsGetNewsById",
                 "parameters": [
                     {
@@ -135,11 +125,6 @@ const docTemplate = `{
         },
         "/editors/refresh": {
             "post": {
-                "security": [
-                    {
-                        "EditorsAuth": []
-                    }
-                ],
                 "description": "editor refresh tokens",
                 "consumes": [
                     "application/json"
@@ -150,7 +135,6 @@ const docTemplate = `{
                 "tags": [
                     "editors"
                 ],
-                "summary": "Editor Refresh Token",
                 "operationId": "editorRefresh",
                 "parameters": [
                     {
@@ -343,6 +327,114 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/httpv1.tokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/visitors/news": {
+            "get": {
+                "description": "visitor get all news",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "visitors"
+                ],
+                "summary": "Visitor GetByHTTPName All News",
+                "operationId": "visitorGetAllNews",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.News"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/httpv1.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/visitors/news/{id}": {
+            "get": {
+                "description": "visitor get news by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "visitors"
+                ],
+                "summary": "Visitor GetByHTTPName News By ID",
+                "operationId": "visitorsGetNewsById",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "news id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.News"
                         }
                     },
                     "400": {

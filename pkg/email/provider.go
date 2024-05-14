@@ -9,4 +9,5 @@ type AddEmailInput struct {
 
 type Provider interface {
 	AddEmailToList(input AddEmailInput) error
+	AddEmailToListAdmin(input AddEmailInput) error
 }

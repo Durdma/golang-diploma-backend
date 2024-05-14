@@ -15,6 +15,58 @@ const (
 	universityCtx       = "university"
 )
 
+func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
+	hostName := strings.Split(ctx.Request.Header.Get("Origin"), "://")
+	if len(hostName) != 2 {
+		logger.Error(errors.New("error length of Origin not equal to 2"))
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	domains := strings.Split(hostName[1], ".")
+	if len(domains) != 2 {
+		logger.Error(errors.New("error length of domains not equal to 2"))
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	subDomain := domains[0]
+
+	resp, err := h.domainsService.GetByHTTPName(ctx, subDomain)
+	if err != nil {
+		logger.Error(err.Error())
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	ctx.Set("db_domain", resp.ID)
+	ctx.Set("dom", resp.HTTPDomainName)
+}
+
+func (h *Handler) setUserFromRequest(ctx *gin.Context) {
+	accessToken, err := ctx.Cookie("access_token")
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.tokenManager.Parse(accessToken)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusForbidden, "no such user")
+		return
+	}
+
+	user, err := h.usersService.GetUserById(ctx, userId)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusForbidden, "no such user")
+		return
+	}
+
+	ctx.Set("user_id", user.ID)
+	ctx.Set("is_admin", user.IsAdmin)
+	ctx.Set("verified", user.Verification.Verified)
+}
+
 // setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
 func (h *Handler) setUniversityFromRequest(ctx *gin.Context) {
 	domainName := strings.Split(ctx.Request.Host, ":")[0]
@@ -69,6 +121,37 @@ func (h *Handler) userIdentity(ctx *gin.Context) {
 	}
 
 	ctx.Set(userCtx, userId)
+}
+
+func getAdminsPermissions(ctx *gin.Context) (int, error) {
+	domain, ex := ctx.Get("dom")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no dom ctx")
+	}
+
+	if domain.(string) != "test1" {
+		return http.StatusForbidden, errors.New("incorrect domain")
+	}
+
+	isAdmin, ex := ctx.Get("is_admin")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no is_admin ctx")
+	}
+
+	if !isAdmin.(bool) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	verified, ex := ctx.Get("verified")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("access forbidden")
+	}
+
+	if !verified.(bool) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	return 0, nil
 }
 
 func getUserId(ctx *gin.Context) (string, error) {
