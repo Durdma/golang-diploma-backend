@@ -79,10 +79,13 @@ type Domains interface {
 // EditorSignUpInput TODO Взято из примера для понимания, при добавлении редакторов переписать
 // EditorSignUpInput - Структура для парсинга данных при регистрации в go-объект из json
 type EditorSignUpInput struct {
-	Name         string
-	Email        string
-	Password     string
-	UniversityID primitive.ObjectID
+	Name       string
+	Email      string
+	Password   string
+	DomainName string
+	DomainId   primitive.ObjectID
+	Verify     bool
+	Block      bool
 }
 
 // Editors - Интерфейс для сервиса редакторов

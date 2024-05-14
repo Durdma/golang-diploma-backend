@@ -35,18 +35,27 @@ func NewEditorsService(repo repository.Editors, hasher hash.PasswordHasher, toke
 	}
 }
 
-// SignUp - Регистрация нового редактора на сайте университета
+//s.emailService.AddToList(AddToListInput{
+//Email:            input.Email,
+//Name:             input.Name,
+//VerificationCode: verificationCode.Hex(),
+//})
+
 func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) error {
 	verificationCode := primitive.NewObjectID()
-	editor := models.Editor{
+	editor := models.User{
 		Name:         input.Name,
-		Password:     s.hasher.Hash(input.Password),
 		Email:        input.Email,
+		Password:     s.hasher.Hash(input.Password),
+		DomainId:     input.DomainId,
+		DomainName:   input.DomainName,
+		IsAdmin:      false,
+		IsBlocked:    input.Block,
 		RegisteredAt: time.Now(),
-		LastVisitAt:  time.Now(),
-		UniversityID: input.UniversityID,
+		LastVisitAt:  time.Time{},
 		Verification: models.Verification{
-			Code: verificationCode,
+			Code:     verificationCode,
+			Verified: input.Verify,
 		},
 	}
 
@@ -54,12 +63,35 @@ func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) er
 		return err
 	}
 
-	return s.emailService.AddToList(AddToListInput{
-		Email:            input.Email,
-		Name:             input.Name,
-		VerificationCode: verificationCode.Hex(),
-	})
+	//return s.emailService.AddToList(AddToListInput{
+	//	Email:            editor.Email,
+	//	Name:             editor.Name,
+	//	VerificationCode: verificationCode.Hex(),
+	//})
+
+	return nil
 }
+
+//func (s *EditorsService) SignUp(ctx context.Context, input EditorSignUpInput) error {
+//	verificationCode := primitive.NewObjectID()
+//	editor := models.Editor{
+//		Name:         input.Name,
+//		Password:     s.hasher.Hash(input.Password),
+//		Email:        input.Email,
+//		RegisteredAt: time.Now(),
+//		LastVisitAt:  time.Now(),
+//		UniversityID: input.UniversityID,
+//		Verification: models.Verification{
+//			Code: verificationCode,
+//		},
+//	}
+//
+//	if err := s.repo.Create(ctx, editor); err != nil {
+//		return err
+//	}
+//
+//	return
+//}
 
 func (s *EditorsService) ChangeEditorBlockStatus(ctx context.Context, editorId string, state string) error {
 	stateBool := false

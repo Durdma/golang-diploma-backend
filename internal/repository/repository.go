@@ -45,7 +45,7 @@ type Admins interface {
 
 // Editors - Интерфейс для репозитория редакторов
 type Editors interface {
-	Create(ctx context.Context, editor models.Editor) error
+	Create(ctx context.Context, editor models.User) error
 	ChangeBlockStatus(ctx context.Context, editorId string, state bool) error
 	ChangeVerificationStatus(ctx context.Context, editorId string, state bool) error
 	GetEditorById(ctx context.Context, userId primitive.ObjectID) (models.User, error)

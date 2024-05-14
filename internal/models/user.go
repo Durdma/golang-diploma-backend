@@ -11,7 +11,7 @@ type User struct {
 	Email        string             `json:"email" bson:"email"`
 	Password     string             `json:"password" bson:"password"`
 	DomainId     primitive.ObjectID `json:"domain_id" bson:"domain_id"`
-	DomainName   string             `json:"domain_name"`
+	DomainName   string             `json:"domain_name" bson:"domain.domain_name,omitempty"`
 	IsAdmin      bool               `json:"is_admin" bson:"is_admin"`
 	IsBlocked    bool               `json:"is_blocked" bson:"is_blocked"`
 	RegisteredAt time.Time          `json:"registered_at" bson:"registered_at"`
