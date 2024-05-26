@@ -24,9 +24,13 @@ type userSignInInput struct {
 }
 
 type userSignInResponse struct {
+	Id      string `json:"id"`
 	Name    string `json:"name"`
 	Domain  string `json:"domain"`
 	IsAdmin bool   `json:"is_admin"`
+	Email   string `json:"email"`
+	Blocked bool   `json:"blocked"`
+	Verify  bool   `json:"verify"`
 }
 
 func (h *Handler) signIn(ctx *gin.Context) {
@@ -56,9 +60,13 @@ func (h *Handler) signIn(ctx *gin.Context) {
 	ctx.SetCookie("access_token", tokens.AccessToken, tokens.AccessTokenTTL, "/", "http://test1.localhost:3000", true, true)
 	ctx.SetCookie("refresh_token", tokens.RefreshToken, tokens.RefreshTokenTTL, "/", "http://test1.localhost:3000", true, true)
 	ctx.JSON(http.StatusOK, userSignInResponse{
+		Id:      user.ID.Hex(),
 		Name:    user.Name,
 		Domain:  user.DomainName,
 		IsAdmin: user.IsAdmin,
+		Email:   user.Email,
+		Blocked: user.IsBlocked,
+		Verify:  user.Verification.Verified,
 	})
 }
 

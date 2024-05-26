@@ -14,7 +14,46 @@ import (
 
 // Universities - Интерфейс для взаимодействия с сервисом университетов
 type Universities interface {
+	AddUniversity(ctx context.Context, domainId primitive.ObjectID, domainName string, shortName string) (primitive.ObjectID, error)
 	GetByDomain(ctx context.Context, domainName string) (models.University, error)
+	GetByUniversityId(ctx context.Context, universityIdStr primitive.ObjectID) (models.University, error)
+	GetUniversityColors(ctx context.Context, universityId primitive.ObjectID) (map[string]string, error)
+	PatchUniversityCSS(ctx context.Context, universityId primitive.ObjectID, colors map[string]string) error
+	SetUniversityHistory(ctx context.Context, universityId primitive.ObjectID, history models.History) error
+}
+
+type NewsInput struct {
+	Header       string
+	Description  string
+	Body         string
+	CreatedBy    string
+	UniversityId primitive.ObjectID
+}
+
+type News interface {
+	AddNews(ctx context.Context, input NewsInput) (primitive.ObjectID, error)
+	GetAllNews(ctx context.Context, domainId primitive.ObjectID) ([]models.News, error)
+	AddHeaderImageURL(ctx context.Context, recordId string, imageURL string) error
+}
+
+type DocsInput struct {
+	UniversityId    primitive.ObjectID
+	Header          string
+	Description     string
+	Code            string
+	Magistrate      bool
+	Enrollee        bool
+	PublicationDate time.Time
+	CreatedBy       string
+}
+
+type Docs interface {
+	AddDocs(ctx context.Context, input DocsInput) (primitive.ObjectID, error)
+	GetAllUniversityDocs(ctx context.Context, universityId primitive.ObjectID) ([]models.Docs, error)
+	GetAllBachelors(ctx context.Context, universityId primitive.ObjectID) ([]models.Docs, error)
+	GetAllMags(ctx context.Context, universityId primitive.ObjectID) ([]models.Docs, error)
+	GetAllEnrollsDocs(ctx context.Context, universityId primitive.ObjectID) ([]models.Docs, error)
+	AddDocsURL(ctx context.Context, docId string, docURL string) error
 }
 
 type Tokens struct {
@@ -31,12 +70,6 @@ type AdminSignUpInput struct {
 	Domain   string
 }
 
-type AdminSignInInput struct {
-	Email    string
-	Password string
-	Domain   string
-}
-
 type Users interface {
 	SignUp(ctx context.Context) error
 	SignIn(ctx context.Context, input SignInInput) (models.User, Tokens, error)
@@ -45,35 +78,33 @@ type Users interface {
 	GetUserById(ctx context.Context, userId string) (models.User, error)
 }
 
-type SiteInput struct {
-	Name           string
-	ShortName      string
-	HTTPDomainName string
-}
-
-type Sites interface {
-	AddNewSite(ctx context.Context, input SiteInput) (primitive.ObjectID, error)
-}
-
 type Admins interface {
 	SignUp(ctx context.Context, input AdminSignUpInput) error
+	GetAll(ctx context.Context) ([]models.User, error)
+	ChangeAdminBlockStatus(ctx context.Context, editorId string, state string) error
+	ChangeAdminVerifyStatus(ctx context.Context, editorId string, state string) error
+	UpdateAdmin(ctx context.Context, newUser UpdateAdminInput) error
 }
 
 type DomainInput struct {
-	HTTPDomain string
-	SiteId     primitive.ObjectID
-	Name       string
+	DomainName string
 	ShortName  string
-	Verified   bool
+	HTTPName   string
+	Verify     bool
+	Visible    bool
 }
 
 type Domains interface {
-	AddDomain(ctx context.Context, input DomainInput) error
+	AddDomain(ctx context.Context, input DomainInput) (primitive.ObjectID, error)
 	DeleteDomain(ctx context.Context, domainId primitive.ObjectID) error
 	GetByHTTPName(ctx context.Context, domain string) (models.Domain, error)
 	GetById(ctx context.Context, domainId primitive.ObjectID) (models.Domain, error)
 	GetByDomainName(ctx context.Context, domainName string) (models.Domain, error)
 	GetAllDomains(ctx context.Context) ([]models.Domain, error)
+	ChangeSiteVisibleStatus(ctx context.Context, domainId string, state string) error
+	ChangeSiteVerifyStatus(ctx context.Context, domainId string, state string) error
+	UpdateDomain(ctx context.Context, newDomain UpdateDomainInput) error
+	AddUniversityId(ctx context.Context, domainId primitive.ObjectID, universityId primitive.ObjectID) error
 }
 
 // EditorSignUpInput TODO Взято из примера для понимания, при добавлении редакторов переписать
@@ -115,7 +146,8 @@ type Services struct {
 	Editors      Editors
 	Domains      Domains
 	Users        Users
-	Sites        Sites
+	News         News
+	Docs         Docs
 }
 
 // NewServices - Создание нового сервиса
@@ -129,6 +161,7 @@ func NewServices(repos *repository.Repositories, cache cache.Cache, hasher hash.
 		Editors:      NewEditorsService(repos.Editors, hasher, tokenManager, emailService, accessTTL, refreshTTL),
 		Domains:      NewDomainsService(repos.DNS),
 		Users:        NewUsersService(repos.Users, hasher, tokenManager, emailService, accessTTL, refreshTTL),
-		Sites:        NewSitesService(repos.Sites),
+		News:         NewNewsService(repos.News),
+		Docs:         NewDocsService(repos.Docs),
 	}
 }

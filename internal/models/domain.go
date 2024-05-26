@@ -1,6 +1,9 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type Domain struct {
 	ID             primitive.ObjectID `json:"id" bson:"_id,omitempty"`
@@ -10,6 +13,7 @@ type Domain struct {
 	DomainName     string             `json:"domain_name" bson:"domain_name"`
 	ShortName      string             `json:"short_name" bson:"short_name"`
 	Visible        bool               `json:"visible" bson:"visible"`
-	Deleted        bool               `json:"deleted" bson:"deleted"`
 	Verified       bool               `json:"verified" bson:"verified"`
+	RegisteredAt   time.Time          `json:"registered_at" bson:"registered_at"`
+	LastUpdate     time.Time          `json:"last_update" bson:"last_update"`
 }

@@ -5,19 +5,32 @@ import (
 	"time"
 )
 
-// University - Сущность для университетов, расположенных на платформе.
 type University struct {
-	ID          primitive.ObjectID `json:"id" bson:"_id,omitempty"` // id записи в MongoDB.
-	Name        string             `json:"name" bson:"name"`        // Название университета.
-	ShortName   string             `json:"short_name" bson:"short_name"`
-	Description string             `json:"description" bson:"description"` // Описание университета.
-	//Domain       Domain              `json:"domain" bson:"domain"`               // Доменное имя университета.
-	Verification bool      `json:"verification" bson:"verification"`   // Статус верификации университета на платформе.
-	RegisteredAt time.Time `json:"registered_at" bson:"registered_at"` // Дата регистрации университета на платформе.
-	VerifiedAt   time.Time `json:"verified_at" bson:"verified_at"`     // Дата верификации университета на платформе.
-	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
-	Editors      []Editor  `json:"editors" bson:"editors"` // Список редакторов контента на сайте университета.
-	News         []News    `json:"news" bson:"news"`
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	DomainId  primitive.ObjectID `json:"domain_id" bson:"domain_id,omitempty"`
+	Name      string             `json:"name" bson:"name"`
+	ShortName string             `json:"short_name" bson:"short_name"`
+	History   History            `json:"history" bson:"history"`
+	Settings  Settings           `json:"settings" bson:"settings"`
+}
+
+type History struct {
+	Body      string             `json:"body" bson:"body"`
+	CreatedBy primitive.ObjectID `json:"created_by" bson:"created_by"`
+	UpdatedBy primitive.ObjectID `json:"updated_by" bson:"updated_by"`
+	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
+}
+
+type Settings struct {
+	ID                       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	MainColor                string             `json:"main_color" bson:"main_color"`
+	MainColorHover           string             `json:"main_color_hover" bson:"main_color_hover"`
+	MainFooterFontColor      string             `json:"main_footer_font_color" bson:"main_footer_font_color"`
+	MainFooterFontColorHover string             `json:"main_footer_font_color_hover" bson:"main_footer_font_color_hover"`
+	MainFooterBgColor        string             `json:"main_footer_bg_color" bson:"main_footer_bg_color"`
+	HeaderImage              string             `json:"header_image,omitempty" bson:"header_image,omitempty"`
+	Label                    string             `json:"label" bson:"label"`
 }
 
 // Editor - Сущность редактора контента на сайте университета.

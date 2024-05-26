@@ -56,8 +56,10 @@ func Run(configPath string, envPath string) {
 	// Подключение хэша
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
 
-	emailProvider := email.NewClient(cfg.Email.Email, cfg.Email.Password, cfg.Email.Provider,
-		cfg.Email.Port)
+	emailProvider := email.NewClient(
+		cfg.Email.Email, cfg.Email.Password,
+		cfg.Email.Provider, cfg.Email.Port,
+	)
 
 	tokenManager, err := auth.NewManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -68,11 +70,20 @@ func Run(configPath string, envPath string) {
 	// Подключение репозиториев
 	repos := repository.NewRepositories(db)
 	// Подключение сервисов
-	services := service.NewServices(repos, memCache, hasher,
-		tokenManager, emailProvider, cfg.Auth.JWT.AccessTokenTTL, cfg.Auth.JWT.RefreshTokenTTL)
+	services := service.NewServices(
+		repos, memCache,
+		hasher, tokenManager,
+		emailProvider, cfg.Auth.JWT.AccessTokenTTL,
+		cfg.Auth.JWT.RefreshTokenTTL,
+	)
 
 	// Добавление контроллера
-	handlers := controller.NewHandler(services.Universities, services.Editors, services.Admins, tokenManager, services.Domains, services.Users, services.Sites)
+	handlers := controller.NewHandler(
+		services.Universities, services.Editors,
+		services.Admins, tokenManager,
+		services.Domains, services.Users,
+		services.News, services.Docs,
+	)
 
 	// Инициализация сервера и его запуск
 	srv := server.NewServer(cfg, handlers.Init(cfg.HTTP.Host, cfg.HTTP.Port))
