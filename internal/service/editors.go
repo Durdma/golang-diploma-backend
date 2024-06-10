@@ -35,6 +35,7 @@ func NewEditorsService(repo repository.Editors, hasher hash.PasswordHasher, toke
 	}
 }
 
+// TODO uncomment later
 //s.emailService.AddToList(AddToListInput{
 //Email:            input.Email,
 //Name:             input.Name,

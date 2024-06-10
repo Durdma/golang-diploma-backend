@@ -24,13 +24,14 @@ type Handler struct {
 	tokenManager        auth.TokenManager
 	domainsService      service.Domains
 	usersService        service.Users
-	sitesService        service.Sites
+	newsService         service.News
+	docsService         service.Docs
 }
 
 // NewHandler - Создание новой сущности обработчика событий
 func NewHandler(universitiesService service.Universities, editorsService service.Editors,
 	adminsService service.Admins, tokenManager auth.TokenManager, domainsService service.Domains,
-	usersService service.Users, sitesService service.Sites) *Handler {
+	usersService service.Users, newsService service.News, docsService service.Docs) *Handler {
 	return &Handler{
 		universitiesService: universitiesService,
 		editorsService:      editorsService,
@@ -38,7 +39,8 @@ func NewHandler(universitiesService service.Universities, editorsService service
 		tokenManager:        tokenManager,
 		domainsService:      domainsService,
 		usersService:        usersService,
-		sitesService:        sitesService,
+		newsService:         newsService,
+		docsService:         docsService,
 	}
 }
 
@@ -62,9 +64,20 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 				}
 
 				for _, orig := range origins {
-					if "http://"+orig.HTTPDomainName+".localhost:3000" == origin {
+					if "http://platform.localhost:3000" == origin {
+						fmt.Println("===========================================")
+						fmt.Println(orig)
+						fmt.Println("===========================================")
 						return true
 					}
+
+					if "http://"+orig.HTTPDomainName+".localhost:5000" == origin {
+						fmt.Println("===========================================")
+						fmt.Println(orig)
+						fmt.Println("===========================================")
+						return true
+					}
+
 				}
 
 				return false
@@ -90,7 +103,8 @@ func (h *Handler) Init(host string, port string) *gin.Engine {
 
 // initAPI - Объединение в более общую группу роутеров
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager, h.domainsService, h.usersService, h.sitesService)
+	handlerV1 := httpv1.NewHandler(h.universitiesService, h.editorsService, h.adminsService, h.tokenManager,
+		h.domainsService, h.usersService, h.newsService, h.docsService)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

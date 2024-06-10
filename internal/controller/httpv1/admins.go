@@ -1,7 +1,9 @@
 package httpv1
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"sas/internal/service"
 	"sas/pkg/logger"
@@ -20,8 +22,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 		{
 			domains.GET("", h.getAllDomains)
 
-			domains.GET("/new", h.getNewSite)
-			domains.POST("/new", h.postDomain) //TODO refactor to POST site
+			domains.POST("", h.postSite)
 
 			domains.GET("/:id", h.getSite)
 			domains.PATCH("/:id", h.patchSite)
@@ -30,8 +31,9 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 
 		adminsGroup := authenticated.Group("/admins")
 		{
-			adminsGroup.POST("/new", h.adminsSignUp)
-			admins.GET("/new")
+			adminsGroup.POST("", h.adminsSignUp)
+			adminsGroup.GET("", h.getAllAdmins)
+			adminsGroup.PATCH("/:id", h.patchAdmin)
 		}
 
 		// Не в приоритете
@@ -99,6 +101,130 @@ func (h *Handler) adminsSignUp(ctx *gin.Context) {
 		logger.Error(err)
 
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Println("OK")
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) getAllAdmins(ctx *gin.Context) {
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
+		return
+	}
+
+	getQueryToContext(ctx)
+
+	admins, err := h.adminsService.GetAll(ctx)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Println(admins)
+	ctx.JSON(http.StatusOK, admins)
+}
+
+func getQueryToContext(ctx *gin.Context) {
+	domainName := ctx.Query("domain_name")
+	if domainName != "" {
+		ctx.Set("domain_name", domainName)
+	}
+
+	name := ctx.Query("name")
+	if name != "" {
+		ctx.Set("name", name)
+	}
+
+	university := ctx.Query("university")
+	if university != "" {
+		fmt.Println(university)
+		ctx.Set("university", university)
+	}
+
+	sort := ctx.Query("sort")
+	if sort != "" {
+		ctx.Set("sort", sort)
+	}
+
+	verify := ctx.Query("verify")
+	if verify != "" {
+		ctx.Set("verify", verify)
+	}
+
+	block := ctx.Query("block")
+	if block != "" {
+		ctx.Set("block", block)
+	}
+
+	visible := ctx.Query("visible")
+	if visible != "" {
+		ctx.Set("visible", visible)
+	}
+}
+
+type patchAdminInput struct {
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Verify   bool   `json:"verify"`
+	Block    bool   `json:"block"`
+}
+
+func (h *Handler) patchAdmin(ctx *gin.Context) {
+	if code, err := getAdminsPermissions(ctx); err != nil {
+		newErrorResponse(ctx, code, err.Error())
+		return
+	}
+
+	userId := ctx.Param("id")
+
+	verify, verifyEx := ctx.GetQuery("verify")
+	block, blockEx := ctx.GetQuery("block")
+
+	switch {
+	case verifyEx && blockEx:
+		newErrorResponse(ctx, http.StatusBadRequest, "error query params")
+		return
+	case blockEx && !verifyEx:
+		err := h.adminsService.ChangeAdminBlockStatus(ctx, userId, block)
+		if err != nil {
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+	case verifyEx && !blockEx:
+		err := h.adminsService.ChangeAdminVerifyStatus(ctx, userId, verify)
+		if err != nil {
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+	case !verifyEx && !blockEx:
+		var userInput patchAdminInput
+		if err := ctx.BindJSON(&userInput); err != nil {
+			newErrorResponse(ctx, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		domainIdCtx, _ := ctx.Get("db_domain")
+		domainId := domainIdCtx.(primitive.ObjectID)
+
+		err := h.adminsService.UpdateAdmin(ctx, service.UpdateAdminInput{
+			Id:       userInput.Id,
+			Name:     userInput.Name,
+			Email:    userInput.Email,
+			Password: userInput.Password,
+			DomainId: domainId.Hex(),
+			Verify:   userInput.Verify,
+			Block:    userInput.Block,
+		})
+		if err != nil {
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+	default:
+		newErrorResponse(ctx, http.StatusInternalServerError, "something wrong")
 		return
 	}
 

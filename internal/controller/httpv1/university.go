@@ -3,31 +3,45 @@ package httpv1
 import "github.com/gin-gonic/gin"
 
 func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
-	university := api.Group("/", h.setUniversityFromRequest)
+	university := api.Group("/university", h.setDomainFromRequest)
 	{
-		university.GET("/sign-in")
-		university.POST("/sign-in")
-
-		university.POST("/auth/refresh")
-
 		university.GET("/verify/:hash")
+		university.GET("/header-image", h.getHeaderImage)
+		university.GET("/logo-image", h.getLogoImage)
+		university.GET("/css", h.getCSS)
+		university.GET("/css/colors", h.getColors)
 
-		authSettings := university.Group("/", h.userIdentity)
+		authSettings := university.Group("/settings", h.setUserFromRequest)
 		{
+			authSettings.GET("/info", h.getUniversity)
 			authSettings.GET("/settings")
-			authSettings.PUT("/settings")
+			authSettings.PATCH("/css", h.patchCSS)
+		}
+
+		historyGroup := university.Group("/history")
+		{
+			historyGroup.GET("", h.getUniversityHistory)
+
+			authHistoryGroup := historyGroup.Group("/", h.setUserFromRequest)
+			{
+				authHistoryGroup.POST("", h.postUniversityHistory)
+				authHistoryGroup.PATCH("")
+			}
 		}
 
 		newsGroup := university.Group("/news")
 		{
-			newsGroup.GET("")
-
+			newsGroup.GET("", h.getAllNews)
+			newsGroup.GET("/header-image/:name", h.getImage)
 			newsGroup.GET("/:id")
+
+			newsGroup.POST("", h.postNews)
+			newsGroup.POST("/header-image/:name", h.setImage)
 
 			newsGroup.GET("/:id/report")
 			newsGroup.POST("/:id/report")
 
-			authNewsGroup := newsGroup.Group("/", h.userIdentity)
+			authNewsGroup := newsGroup.Group("/", h.setUserFromRequest)
 			{
 				authNewsGroup.GET("/new")
 				authNewsGroup.POST("/new")
@@ -38,49 +52,31 @@ func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
 			}
 		}
 
-		structureGroup := university.Group("/structure")
+		documentsGroup := university.Group("/docs")
 		{
-			structureGroup.GET("")
+			documentsGroup.GET("", h.getAllUniversityDocs)
+			documentsGroup.GET("/:doc_id", h.getDocs)
 
-			structureGroup.GET("/:id")
-
-			structureGroup.GET("/:id/:depart_id")
-
-			authStructureGroup := structureGroup.Group("/", h.userIdentity)
-			{
-				authStructureGroup.GET("/new")
-				authStructureGroup.POST("/new")
-
-				authStructureGroup.GET("/:id/edit")
-				authStructureGroup.PUT("/:id/edit")
-				authStructureGroup.DELETE("/:id/edit")
-
-				authStructureGroup.GET("/:id/new")
-				authStructureGroup.POST("/:id/new")
-
-				authStructureGroup.GET("/:id/:depart_id/edit")
-				authStructureGroup.PUT("/:id/:depart_id/edit")
-				authStructureGroup.DELETE("/:id/:depart_id/edit")
-			}
-		}
-
-		documentsGroup := university.Group("/documents")
-		{
-			documentsGroup.GET("")
-
-			documentsGroup.GET("/:id")
-
-			documentsGroup.GET("/:id/url")
-
-			authDocumentsGroup := documentsGroup.Group("/", h.userIdentity)
-			{
-				authDocumentsGroup.GET("/new")
-				authDocumentsGroup.POST("/new")
-
-				authDocumentsGroup.GET("/:id/edit")
-				authDocumentsGroup.PUT("/:id/edit")
-				authDocumentsGroup.DELETE("/:id/edit")
-			}
+			documentsGroup.POST("", h.postDocs)
+			documentsGroup.POST("/:doc_id", h.setDocs)
+			documentsGroup.GET("/bachelors", h.getAllBachelors)
+			documentsGroup.POST("/bachelors", h.postStudyPlanDocs)
+			documentsGroup.POST("/bachelors/:doc_id", h.setDocs)
+			documentsGroup.GET("/mags", h.getAllMags)
+			documentsGroup.POST("/mags", h.postStudyPlanDocs)
+			documentsGroup.POST("/mags/:doc_id", h.setDocs)
+			documentsGroup.GET("/enrollee", h.getAllEnrollsDocs)
+			documentsGroup.POST("/enrollee", h.postStudyPlanDocs)
+			documentsGroup.POST("/enrollee/:doc_id", h.setDocs)
+			//authDocumentsGroup := documentsGroup.Group("/")
+			//{
+			//	//authDocumentsGroup.GET("/new")
+			//	//authDocumentsGroup.POST("/new")
+			//	//
+			//	//authDocumentsGroup.GET("/:id/edit")
+			//	//authDocumentsGroup.PUT("/:id/edit")
+			//	//authDocumentsGroup.DELETE("/:id/edit")
+			//}
 		}
 
 		programsGroup := university.Group("/programs")
@@ -89,7 +85,7 @@ func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
 
 			programsGroup.GET("/:id")
 
-			authProgramsGroup := programsGroup.Group("/", h.userIdentity)
+			authProgramsGroup := programsGroup.Group("/")
 			{
 				authProgramsGroup.GET("/new")
 				authProgramsGroup.POST("/new")
@@ -109,7 +105,7 @@ func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
 			applicantsGroup.GET("/:id/report")
 			applicantsGroup.POST("/:id/report")
 
-			authAppNewsGroup := applicantsGroup.Group("/", h.userIdentity)
+			authAppNewsGroup := applicantsGroup.Group("/")
 			{
 				authAppNewsGroup.GET("/new")
 				authAppNewsGroup.POST("/new")
@@ -127,7 +123,7 @@ func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
 
 				appDocs.GET("/:id/:url")
 
-				authAppDocs := appDocs.Group("/", h.userIdentity)
+				authAppDocs := appDocs.Group("/")
 				{
 					authAppDocs.GET("/new")
 					authAppDocs.POST("/new")
@@ -144,7 +140,7 @@ func (h *Handler) initUniversityRoutes(api *gin.RouterGroup) {
 
 				appTables.GET("/:id")
 
-				authAppTables := appTables.Group("/", h.userIdentity)
+				authAppTables := appTables.Group("/")
 				{
 					authAppTables.GET("/new")
 					authAppTables.POST("/new")

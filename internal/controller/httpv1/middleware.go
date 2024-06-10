@@ -3,8 +3,8 @@ package httpv1
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
-	"sas/internal/models"
 	"sas/pkg/logger"
 	"strings"
 )
@@ -41,6 +41,7 @@ func (h *Handler) setDomainFromRequest(ctx *gin.Context) {
 
 	ctx.Set("db_domain", resp.ID)
 	ctx.Set("dom", resp.HTTPDomainName)
+	ctx.Set("university_id", resp.SiteId)
 }
 
 func (h *Handler) setUserFromRequest(ctx *gin.Context) {
@@ -65,62 +66,7 @@ func (h *Handler) setUserFromRequest(ctx *gin.Context) {
 	ctx.Set("user_id", user.ID)
 	ctx.Set("is_admin", user.IsAdmin)
 	ctx.Set("verified", user.Verification.Verified)
-}
-
-// setUniversityFromRequest - Получение домена, с которого пришел запрос и обращение к нужному университету
-func (h *Handler) setUniversityFromRequest(ctx *gin.Context) {
-	domainName := strings.Split(ctx.Request.Host, ":")[0]
-
-	univ, err := h.universitiesService.GetByDomain(ctx.Request.Context(), domainName)
-	if err != nil {
-		logger.Error(err)
-		ctx.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-
-	ctx.Set(universityCtx, univ)
-}
-
-// getUniversityFromContext - Получение имени университета из контекста запроса
-func getUniversityFromContext(ctx *gin.Context) (models.University, error) {
-	value, ex := ctx.Get(universityCtx)
-	if !ex {
-		return models.University{}, errors.New("university is missing from context")
-	}
-
-	univ, ok := value.(models.University)
-	if !ok {
-		return models.University{}, errors.New("failed to convert value from ctx to university.University")
-	}
-
-	return univ, nil
-}
-
-func (h *Handler) userIdentity(ctx *gin.Context) {
-	header := ctx.GetHeader(authorizationHeader)
-	if header == "" {
-		newErrorResponse(ctx, http.StatusUnauthorized, "empty auth header")
-		return
-	}
-
-	headerParts := strings.Split(header, " ")
-	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		newErrorResponse(ctx, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
-
-	if len(headerParts[1]) == 0 {
-		newErrorResponse(ctx, http.StatusUnauthorized, "token is empty")
-		return
-	}
-
-	userId, err := h.tokenManager.Parse(headerParts[1])
-	if err != nil {
-		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
-		return
-	}
-
-	ctx.Set(userCtx, userId)
+	ctx.Set("domain_id", user.DomainId)
 }
 
 func getAdminsPermissions(ctx *gin.Context) (int, error) {
@@ -129,7 +75,7 @@ func getAdminsPermissions(ctx *gin.Context) (int, error) {
 		return http.StatusUnauthorized, errors.New("no dom ctx")
 	}
 
-	if domain.(string) != "test1" {
+	if domain.(string) != "platform" {
 		return http.StatusForbidden, errors.New("incorrect domain")
 	}
 
@@ -154,16 +100,29 @@ func getAdminsPermissions(ctx *gin.Context) (int, error) {
 	return 0, nil
 }
 
-func getUserId(ctx *gin.Context) (string, error) {
-	id, ok := ctx.Get(userCtx)
-	if !ok {
-		return "", errors.New("user id not found")
+func getEditorsPermissions(ctx *gin.Context) (int, error) {
+	origin, ex := ctx.Get("db_domain")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no dom ctx")
 	}
 
-	idStr, ok := id.(string)
-	if !ok {
-		return "", errors.New("user id is of invalid type")
+	domainId, ex := ctx.Get("domain_id")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("no domain_id")
 	}
 
-	return idStr, nil
+	if origin.(primitive.ObjectID) != domainId.(primitive.ObjectID) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	verified, ex := ctx.Get("verified")
+	if !ex {
+		return http.StatusUnauthorized, errors.New("access forbidden")
+	}
+
+	if !verified.(bool) {
+		return http.StatusForbidden, errors.New("access forbidden")
+	}
+
+	return 0, nil
 }

@@ -14,30 +14,7 @@ func (h *Handler) getAllEditors(ctx *gin.Context) {
 		return
 	}
 
-	name := ctx.Query("name")
-	if name != "" {
-		ctx.Set("name", name)
-	}
-
-	university := ctx.Query("university")
-	if university != "" {
-		ctx.Set("university", university)
-	}
-
-	sort := ctx.Query("sort")
-	if sort != "" {
-		ctx.Set("sort", sort)
-	}
-
-	verify := ctx.Query("verify")
-	if verify != "" {
-		ctx.Set("verify", verify)
-	}
-
-	block := ctx.Query("block")
-	if block != "" {
-		ctx.Set("block", block)
-	}
+	getQueryToContext(ctx)
 
 	editors, err := h.editorsService.GetAllEditors(ctx)
 	if err != nil {
@@ -45,6 +22,9 @@ func (h *Handler) getAllEditors(ctx *gin.Context) {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+	fmt.Println("editors")
+	fmt.Println(editors)
+	fmt.Println("/editors")
 
 	for idx, editor := range editors {
 		domain, err := h.domainsService.GetById(ctx, editor.DomainId)
@@ -57,7 +37,9 @@ func (h *Handler) getAllEditors(ctx *gin.Context) {
 		editors[idx].DomainName = domain.DomainName
 	}
 
+	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println(editors)
+	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	ctx.JSON(http.StatusOK, editors)
 }
 

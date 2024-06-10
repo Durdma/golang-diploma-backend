@@ -32,6 +32,7 @@ func (r *EditorsRepo) Create(ctx context.Context, editor models.User) error {
 	return err
 }
 
+// TODO refactor change status to 1 func
 func (r *EditorsRepo) ChangeBlockStatus(ctx context.Context, editorId string, state bool) error {
 	id, err := primitive.ObjectIDFromHex(editorId)
 	if err != nil {
@@ -173,8 +174,6 @@ func (r *EditorsRepo) GetAllEditors(ctx context.Context) ([]models.User, error) 
 			{"foreignField", "_id"},
 			{"as", "domain"},
 		}}}
-
-	// unWindStage := bson.D{{"$unwind", bson.D{{"path"}}}}
 
 	sortStage := bson.D{{"$sort", bson.D{{"domain.domain_name", 1}}}}
 
